@@ -5,13 +5,26 @@ The Notiphy Widget is a notification system designed to integrate seamlessly int
 configuration options.
 
 ## Installation
+The easiest way to add the Notiphy widget is to use the CDN links below to include the widget in your HTML.
 
-### Prerequisites
+### CDN (JSDelivr)
+ 
+- `https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@1.0.0/dist/notiphy-widget.umd.js`
+- `https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@1.0.0/dist/style.css`
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@1.0.0/dist/notiphy-widget.umd.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@1.0.0/dist/style.css">
+```
+
+### Or build it yourself
+#### Prerequisits
 - Node.js (version 14 or later)
 - npm (Node Package Manager)
 - Vite (for bundling and packaging)
 
-### Setup
+#### Setup
 
 1. **Clone the Repository**
     ```bash
