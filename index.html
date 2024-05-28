@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Widget</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+        body {
+            background-color: #051722;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            line-height: normal;
+            color: #333;
+
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, .7);
+            border-radius: 5px;
+        }
+
+        .logo {
+
+            max-width: 1000px;
+            margin: 0 auto;
+            font-family: "Pacifico", cursive;
+            color: rgb(133, 133, 133);
+            padding: 0 0 .5rem 0;
+        }
+
+        .logo span {
+            position: relative;
+            font-weight: 300;
+            font-size: 3rem;
+            z-index: 1001;
+        }
+
+        .logo .material-symbols-outlined {
+            position: absolute;
+            color: #FFF;
+            text-shadow: 0 0 9px #ff00d9;
+            right: -1rem;
+            top: 1.2rem;
+            font-size: 1.6rem;
+            z-index: 1000;
+            transform: rotate(24deg);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 0 0 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, .1);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 0 0 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, .1);
+        }
+
+        h5,
+        h6 {
+            border-bottom: none;
+        }
+
+        pre {
+            background-color: #eee;
+            border: 1px solid #999;
+            border-radius: 5px;
+            display: block;
+            font-size: 13px;
+            line-height: 18px;
+            margin: 0 0 18px;
+            padding: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .mono {
+            font-family: monospace;
+        }
+
+        .inline-pre {
+            display: inline-block;
+            font-family: monospace;
+            background-color: #eee;
+            border: 1px solid #999;
+            border-radius: 5px;
+            font-size: .8rem;
+            line-height: normal;
+            padding: .2rem .6rem;
+            margin: .2rem;
+            white-space: pre-wrap;
+        }
+
+        .post {
+            color: rgba(0, 0, 80, 1);
+            background-color: rgba(0, 0, 80, 0.10);
+            font-weight: bolder;
+            padding: .2rem .6rem;
+        }
+
+        .callout {
+            font-size: .9rem;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.05) 88%);
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.054);
+            padding: .37rem 1rem .37rem .5rem;
+            margin: 1rem 2rem 1.5rem;
+            border-left: 6px solid rgba(0, 0, 0, 0.5);
+            font-family: var(--notiphy-font-family);
+            font-weight: 400;
+            font-style: normal;
+
+        }
+
+        .callout-warning {
+            border-left: 6px solid #ff9800;
+        }
+
+        .callout-success {
+            border-left: 6px solid #4caf50;
+        }
+
+        .callout-error {
+            border-left: 6px solid #f44336;
+        }
+
+        .callout-info {
+            border-left: 6px solid #2196f3;
+        }
+        .callout-primary {
+            border-left: 6px solid #080275;
+        }
+        .callout-blocker {
+            border: 1px solid #af0000;
+            border-left-width: 6px;
+            font-weight:bold;
+            display:flex;
+            align-items:center;
+
+        }
+        li.callout {
+            font-family: monospace;
+            font-size: .8em;
+            margin: .25rem;
+            width: 288px;
+            list-style-type: none;
+        }
+
+        .callout ul>li {
+            list-style-type: none;
+        }
+
+        li>ul {
+            margin: 1rem 0;
+        }
+
+        .callout:hover {
+            opacity: 1;
+            filter: unset;
+        }
+
+        .callout-blocker .material-symbols-outlined {
+            line-height: 0;
+            /* font-size: 1rem; */
+            color:#af0000;
+        }
+
+        .tryitout {
+            text-align: center;
+        }
+
+        .tryit-btn {
+            box-sizing: content-box;
+            background-color: rgba(8, 5, 58, 1);
+            color: #FFF !important;
+            border: 3px solid #FFF;
+            border-radius: 9px;
+            padding: 0.5rem 1rem;
+            box-shadow:
+                2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),
+                6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),
+                12.5px 12.5px 10px rgba(0, 0, 0, 0.035),
+                22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
+                41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
+                100px 100px 80px rgba(0, 0, 0, 0.07);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease-in-out;
+            margin: 2rem;
+        }
+
+        .tryit-btn:hover {
+            background-color: rgba(8, 5, 58, .75);
+            color: #FFF;
+            border: 3px solid #FFF;
+            text-shadow: 0 0 9px #ff00d9;
+        }
+        .link-btn {
+            cursor:pointer;
+            text-decoration: underline;
+        }
+    </style>
+    <link rel="stylesheet" href="dist/style.css">
+    <script src="dist/notiphy-widget.umd.js"></script>
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>@media (prefers-color-scheme: light){ :root{ filter: none;}}@media (prefers-color-scheme: dark){ :root{ filter: invert(100%);}}</style><path d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6'/></svg>">
+ </head>
+
+<body>
+    <div class="logo">
+        <span>Notiphy.me<i class="material-symbols-outlined">notifications</i></span>
+
+    </div>
+    <div class="container">
+        <h1>Notiphy Inbox</h1>
+        <p>The absolute simplest way to add notifications and an inbox to your app or website.</p>
+
+        <div class="callout">
+            <h4>Features</h4>
+            <ol>
+                <li>Use the API to send a notification in JSON format.</li>
+                <li>Notifications can be sent to a specific location, or all tenant locations.</li>
+                <li>Add the notification center anywhere by embedding the Javascript widget.</li>
+                <li>Configure the widget to show toasts, or play an audio alert.</li>
+                <li>Notifications can be marked read, or dismissed (discards from notification center).</li>
+                <li>User activity is synchronised accross widgets initialized for the same location.</li>
+                <li>By default, notifications have a TTL of 24 hours.</li>
+            </ol>
+        </div>
+
+        <h4>The Notiphy Widget</h4>
+        <p>
+            The Javascript widget provides a complete inbox for your app or website, just paste the widget script
+            Notiphy generates for you at the end of any page you want to include Notiphy in.
+        </p>
+        <p>The widget on this page is initialized for location 101 at tenant acme.</p>
+        <div class="tryitout">
+            <!-- Try it out button -->
+            <button id="tryItOutButton" class="tryit-btn">Try it out</button>
+        </div>
+        <h4>Embed the widget</h4>
+        <p>Include the widget and it's CSS in your document's <span class="inline-pre">&lt;head></span> section.</p>
+        <pre>
+
+        &lt;head>
+            ...
+            &lt;link rel="stylesheet" href="path/to/style.css">
+            &lt;script src="path/to/notiphy-widget.umd.js">&lt;/script>
+        &lt;/head>
+        </pre>
+        <h5>Or CDN</h5>
+        <ul>
+            <li>CSS: <span class="inline-pre">https://url-to-cdn/notiphy/style.css</span></li>
+            <li>JS: <span class="inline-pre">https://url-to-cdn/notiphy/notiphy-widget.umd.js</span></li>
+        </ul>
+        
+        <p>Initialize the widget before your closing <span class="inline-pre">&lt;/body></span> tag.</p>
+        <pre>
+
+        &lt;body>
+            ...
+            page content
+            ...
+            &lt;script>
+            const notiphyConfig = {
+                    tenant: 'your-tenant-id',
+                    widgetKey: 'widget-api-key',
+                    }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                new NotiphyWidget(notiphyConfig);
+            });
+            &lt;/script>
+        &lt;/body>
+        </pre>
+        <div class="callout">
+            <h4>Config parameters</h4>
+            <ol class="mono">
+                <li>tenant .......... [Required] The tenant ID for the notification service.</li>
+                <li>widgetKey ....... [Required] The widget API key for the notification service.</li>
+                <li>locationId ...... The location ID for the Widget (default: 'default').</li>
+                <li>widgetTitle ..... Custom title to be displayed in the Inbox.</li>
+                <li>audioAlert ...... Enable audio (off by default)</li>
+                <li>audioReminder ... Audible reminder of unread notifications at the specified interval (off by
+                    default).</li>
+                <li>reminderInterval. Interval in seconds to play the reminder (default: 180/3minutes, no minimum).</li>
+                <li>toastAlert ...... Show toast notifications (off by default).</li>
+                <li>toastPosition ... The position of the toast notification (default: "bottom-right").</li>
+                <li>toastDuration ... The duration in seconds to display the toast notification (default: 4s).</li>
+                <li>width ........... The width of the Inbox (default: "300px", 'vh' also supported).</li>
+                <li>height .......... The height of the Inbox (default: "400px", 'vh' also supported).</li>
+                <li>showInboxOnLoad.. Whether to show the Inbox by default (default: false).</li>
+                <li>refreshInterval.. Seconds until auto-refresh Inbox if provided. (off by default, min. 300).</li>
+            </ol>
+        </div>
+        
+        <h4>Notification API</h4>
+        <h5>Send a notification</h5>
+        <p>Test this widget by sending a notification to <strong>acme</strong> location
+            <strong>101</strong>.
+        </p>
+        <ul>
+            <li>HTTP <span class="inline-pre post">POST</span> to <span
+                    class="inline-pre">https://notiphy.me/api/notification</span></li>
+            <li>Include header <span class="inline-pre">x-api-key.</span> Demo key: <span class="inline-pre">acme_UpsrDDuw_KbJUh45Gb5GyZg8NNqmBzmXw</span></li>
+        </ul>
+        <pre>
+        {
+        "tenant": "acme",
+        "locationId": "101",
+        "notification": {
+            "title": "Notification Title",
+            "text": "Body of the notification."
+            "alertLevel": "",
+            "actionUrl": "/path/to/action"
+            }
+        }
+  </pre>
+        <div class="callout">
+            <ul>
+                <li><span class="inline-pre">"locationId"</span> is optional. If not specified, the notification will be
+                    sent to all locations for the tenant.</li>
+            </ul>
+        </div>
+        <p>
+            The optional properties of <span class="inline-pre">"notification"</span> can be used to customize the
+            notification.
+        </p>
+        <ul>
+            <li>
+                <span class="inline-pre">"alertLevel"</span> <br>
+                Use this property to specify the alert level of the notification. The alert level can be one of the
+                following:
+                <ul>
+                    <li class="callout">default ("" or not present)</li>
+                    <li class="callout callout-primary"><strong>"primary"</strong></li>
+                    <li class="callout callout-info"><strong>"info"</strong></li>
+                    <li class="callout callout-success"><strong>"success"</strong></li>
+                    <li class="callout callout-warning"><strong>"warning"</strong></li>
+                    <li class="callout callout-error"><strong>"error"</strong></li>
+                    <li class="callout callout-blocker"><i class="material-symbols-outlined">crisis_alert</i><strong>"blocker"</strong></li>
+                    <li style="list-style-type:none;font-size:.8rem;opacity: .8;margin-left:1rem;"><span class="inline-pre">"alertLevel":"blocker"</span>forces a modal to open that prevents the User
+                from continuing until the notification is dismissed. <a class="link-btn" id="tryBlockerButton">Try it</a>.</li>
+                </ul>
+                 
+            
+            </li>
+
+            <li><span class="inline-pre">"actionUrl"</span> <br>
+                If this property is specified, the body of the notification is a clickable link for the recipient.
+                With the exception of <span class="inline-pre">cursor:pointer;</span>, the notification appearance is
+                not
+                altered.</li>
+                <li><span class="inline-pre">"ttl"</span> <br>
+                    Time-to-live. Number of seconds before notification expires (default <span class="inline-pre">86400</span> (1day)).</li>
+        </ul>
+    </div>
+
+    <script>
+        const notiphyApiEndpoint = 'http://app.notiphy.me';
+        const notiphyApiKey = 'acme_UpsrDDuw_KbJUh45Gb5GyZg8NNqmBzmXw'; //NOT widget key. Used for sending notifications.
+        const notiphyConfig = {
+            tenant: 'acme',
+            widgetKey: 'acme_ahZGqLQf_3Pn7ynt4k3fHLJefUeD4c6Pd', // Demo Widget api key provided.
+            locationId: '101',         // Optional
+            widgetTitle: 'Notification Feed',  // Optional
+            height: '65vh',            // Optional
+            audioAlert: true,          // Optional
+            audioReminder: true,       // Optional
+            reminderInterval: 120,     // Optional
+            toastAlert: true,          // Optional
+            toastPosition: 'top-center', // Optional
+            toastDuration: 6,          // Optional
+            showInboxOnLoad: false,    // Optional
+            // refreshInterval: 600         // Optional
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            new NotiphyWidget(notiphyConfig);
+
+        });
+        const alertLevels = ['primary', 'info', 'success', 'warning', 'error', 'blocker'];
+
+        
+
+        document.getElementById('tryItOutButton').addEventListener('click', () => {
+            const randomAlertLevel = alertLevels[Math.floor(Math.random() * alertLevels.length)];
+            const notificationData = {
+                tenant: "acme",
+                locationId: "101",
+                notification: {
+                    title: `${randomAlertLevel[0].toUpperCase()}${randomAlertLevel.slice(1)} Notification`,
+                    text: `This notification is sent with an alertLevel of '${randomAlertLevel}'.`,
+                    alertLevel: randomAlertLevel,
+                    actionUrl: "/path/to/action",
+                    ttl: 30
+                }
+            };
+            
+            fetch(`${notiphyApiEndpoint}/api/notifications`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': notiphyApiKey
+                },
+                body: JSON.stringify(notificationData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Notification sent successfully:', data);
+                })
+                .catch((error) => {
+                    console.error('Error sending notification:', error);
+                });
+        });
+
+        document.getElementById('tryBlockerButton').addEventListener('click', () => {
+            const notificationData = {
+                tenant: "acme",
+                locationId: "101",
+                notification: {
+                    title: "Blocker Notification!",
+                    text: "This notification was sent with alertLevel: blocker. The User will be unable to continue until this notification is dismissed.",
+                    alertLevel: "blocker",
+                    actionUrl: "",
+                    ttl: 30
+                }
+            };
+            
+            fetch(`${notiphyApiEndpoint}/api/notifications`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': notiphyApiKey
+                },
+                body: JSON.stringify(notificationData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Notification sent successfully:', data);
+                })
+                .catch((error) => {
+                    console.error('Error sending notification:', error);
+                });
+        });
+    
+        
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,881 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+
+/* Notiphy variables */
+:root {
+    /* Inbox fonts */
+    --notiphy-logo-font-family: "Pacifico", cursive;
+    --notiphy-primary-font-family: "Roboto", sans-serif;
+
+    /* Color variables (rgb) */
+    --notiphy-bell-glow-color: 255, 0, 217;
+    --notiphy-toggle-glow-color: 255, 0, 217;
+
+    /* Alert level colors */
+    --notiphy-plain-color: 180, 180, 180;
+    --notiphy-primary-color: 8, 2, 117;
+    --notiphy-info-color: 33, 149, 243;
+    --notiphy-success-color: 76, 175, 79;
+    --notiphy-warning-color: 255, 153, 0;
+    --notiphy-error-color: 244, 67, 54;
+    --notiphy-blocker-color: 175, 0, 0;
+}
+
+/* some globals out of the way. Mostly to keep bootstrap or other libraries 
+from interfering with our styles */
+.notiphy-icon, .notiphy-toaster, #notiphy-notification-center {
+    position:fixed;
+    box-sizing: border-box;
+    font-family: var(--notiphy-primary-font-family);
+    color: rgba(0, 0, 0, 0.9);
+    line-height: 1.5;
+}
+/* Inbox toggle icon/button */
+.notiphy-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(8, 5, 58, .8);
+    /* Change based on notification status */
+    border: 3px solid white;
+    color: white;
+    border-radius: 50%;
+    box-shadow:
+        2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),
+        6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),
+        12.5px 12.5px 10px rgba(0, 0, 0, 0.035),
+        22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
+        41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
+        100px 100px 80px rgba(0, 0, 0, 0.07);
+    box-sizing: border-box;
+    cursor: pointer;
+    z-index: 5001;
+}
+/* style icon when unread notifications exist */
+.notiphy-icon-unread {
+    text-shadow: 0 0 9px rgba(var(--notiphy-bell-glow-color), 1);
+}
+/* The bell */
+.notiphy-icon-unread i {
+    animation: ring 4s .7s ease-in-out infinite;
+    transform-origin: 50% 4px;
+}
+@keyframes ring {
+    0% { transform: rotate(0); }
+    1% { transform: rotate(30deg); }
+    3% { transform: rotate(-28deg); }
+    5% { transform: rotate(34deg); }
+    7% { transform: rotate(-32deg); }
+    9% { transform: rotate(30deg); }
+    11% { transform: rotate(-28deg); }
+    13% { transform: rotate(26deg); }
+    15% { transform: rotate(-24deg); }
+    17% { transform: rotate(22deg); }
+    19% { transform: rotate(-20deg); }
+    21% { transform: rotate(18deg); }
+    23% { transform: rotate(-16deg); }
+    25% { transform: rotate(14deg); }
+    27% { transform: rotate(-12deg); }
+    29% { transform: rotate(10deg); }
+    31% { transform: rotate(-8deg); }
+    33% { transform: rotate(6deg); }
+    35% { transform: rotate(-4deg); }
+    37% { transform: rotate(2deg); }
+    39% { transform: rotate(-1deg); }
+    41% { transform: rotate(1deg); }
+    43% { transform: rotate(0); }
+    100% { transform: rotate(0); }
+}
+
+/* Unread-count badge appears top-left of inbox when open */
+.notiphy-notification-center-stats-unread, .notiphy-notification-count {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    color: white;
+    border-radius: 10px;
+    border: 2px solid white;
+    background-color: #f44336;
+    /* box-shadow: 0 0 3px rgba(0, 0, 0, 0.6); */
+    line-height: normal;
+    font-size: .7rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 4px;
+    height: 20px;
+    width: auto;
+    min-width: 20px;
+    
+    
+}
+/* reposition to the right of the icon when inbox is closed*/
+.notiphy-notification-count {
+    left:unset;
+    top: -10px;
+    right: -6px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    transition: transform .2s ease-in-out;
+    
+}
+
+/* Toast styles */
+/* toast container */
+.notiphy-toaster {
+    width: 340px;
+    z-index: 5001;
+}
+
+/* Toaster Positions */
+.notiphy-toaster.top-left {
+    top: 1rem;
+    left: 1rem;
+}
+
+.notiphy-toaster.top-center {
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.notiphy-toaster.top-right {
+    top: 1rem;
+    right: 1rem;
+}
+
+.notiphy-toaster.bottom-left {
+    bottom: 1rem;
+    left: 1rem;
+}
+
+.notiphy-toaster.bottom-center {
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.notiphy-toaster.bottom-right {
+    bottom: 1rem;
+    right: 1rem;
+}
+
+/* Position specific styling for toast. Alters show/hide animation directions based on position */
+/* Top-right position */
+.notiphy-toaster.top-right .notiphy-toast {
+    transform: translateX(100%);
+}
+.notiphy-toaster.top-right .notiphy-toast.show {
+    transform: translateX(0);
+}
+.notiphy-toaster.top-right .notiphy-toast.hide {
+    transform: translateY(-100%);
+}
+
+/* Top-center position */
+.notiphy-toaster.top-center .notiphy-toast {
+    transform: translateY(-100%);
+}
+.notiphy-toaster.top-center .notiphy-toast.show {
+    transform: translateY(0);
+}
+.notiphy-toaster.top-center .notiphy-toast.hide {
+    transform: translateY(-100%);
+}
+
+/* Top-left position */
+.notiphy-toaster.top-left .notiphy-toast {
+    transform: translateX(-100%);
+}
+.notiphy-toaster.top-left .notiphy-toast.show {
+    transform: translateX(0);
+}
+.notiphy-toaster.top-left .notiphy-toast.hide {
+    transform: translateY(-100%);
+}
+
+/* Bottom-right position */
+.notiphy-toaster.bottom-right .notiphy-toast {
+    transform: translateX(100%);
+}
+.notiphy-toaster.bottom-right .notiphy-toast.show {
+    transform: translateX(0);
+}
+.notiphy-toaster.bottom-right .notiphy-toast.hide {
+    transform: translateY(100%);
+}
+
+/* Bottom-center position */
+.notiphy-toaster.bottom-center .notiphy-toast {
+    transform: translateY(100%);
+}
+.notiphy-toaster.bottom-center .notiphy-toast.show {
+    transform: translateY(0);
+}
+.notiphy-toaster.bottom-center .notiphy-toast.hide {
+    transform: translateY(100%);
+}
+
+/* Bottom-left position */
+.notiphy-toaster.bottom-left .notiphy-toast {
+    transform: translateX(-100%);
+}
+.notiphy-toaster.bottom-left .notiphy-toast.show {
+    transform: translateX(0);
+}
+.notiphy-toaster.bottom-left .notiphy-toast.hide {
+    transform: translateY(100%);
+}
+
+/* General toast styles */
+/* base toast */
+.notiphy-toast {
+    border-left: 6px solid rgba(var(--notiphy-plain-color), 1);
+    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.3);
+    margin-bottom: .2rem;
+    opacity: 0;
+    transition: transform 250ms ease-out, opacity 250ms ease-in-out;
+}
+
+/* primary toast */
+.notiphy-toaster .notiphy-primary {
+    border-left: 6px solid rgba(var(--notiphy-primary-color), 1);
+}
+
+/* info toast */
+.notiphy-toaster .notiphy-info {
+    border-left: 6px solid rgba(var(--notiphy-info-color), 1);
+}
+
+/* warning toast */
+.notiphy-toaster .notiphy-warning {
+    border-left: 6px solid rgba(var(--notiphy-warning-color), 1);
+}
+
+/* success toast */
+.notiphy-toaster .notiphy-success {
+    border-left: 6px solid rgba(var(--notiphy-success-color), 1);
+}
+
+/* error toast */
+.notiphy-toaster .notiphy-error {
+    border-left: 6px solid rgba(var(--notiphy-error-color), 1);
+}
+
+/* show toast */
+.notiphy-toast.show {
+    opacity: 1;
+}
+
+/* hide toast */
+.notiphy-toast.hide {
+    opacity: 0;
+    transition: transform 250ms ease-in, opacity 250ms ease-out;
+}
+
+/* toast timer/progress bar container.  */
+.notiphy-toast .progress, .notiphy-notification-element .progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+}
+/* the timer/progress indicator */
+.notiphy-toast .progress:before, .notiphy-notification-element .progress:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: var(--alert-color, rgba(var(--notiphy-info-color), 1)); /* Default to info color */
+    animation: progress var(--toast-duration, 4000ms) linear forwards; /* Default duration */
+    animation-play-state: var(--animation-play-state, running);
+}
+/* progress animation */
+@keyframes progress {
+    100% {
+        width: 0;
+    }
+}
+
+/* Blocker modal */
+.notiphy-modal {
+    color: rgba(0, 0, 0, .8);
+    display: none;
+    position: fixed;
+    z-index: 5002;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.5s forwards;
+
+}
+
+.notiphy-modal.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+.notiphy-modal-content {
+    background: linear-gradient(150deg, rgba(255, 255, 255, 1) 5%, rgba(255, 255, 255, 0.7) 100%); /* more opaque version of the inbox */
+    margin: 15% auto;
+    padding: 12px;
+    border: 3px solid rgba(var(--notiphy-blocker-color), 1);
+    width: 80%;
+    max-width: 500px;
+    border-radius: 11px;
+    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.notiphy-modal-footer {
+    /* button positioning */
+    text-align: right;
+}
+/* The 'X' button */
+.notiphy-close-button {
+    color: rgba(0, 0, 0, .6);
+    float: right;
+    line-height: .5;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.25s ease-in-out;
+}
+.notiphy-close-button:hover,
+.notiphy-close-button:focus {
+    color: rgba(0, 0, 0, 1);;
+}
+/* blocker modal header */
+.notiphy-modal-header {
+    padding: .2rem;
+    border-image: linear-gradient(90deg, rgba(0,0,0, .3), rgba(255,255,255, 0) 80%) 1 / 1px;
+    border-image-width: 0 0 1px 0;
+}
+/* blocker icon (modal) */
+.notiphy-modal-header i {
+    margin-right:.5rem;
+    font-size: 1.6rem;
+    color: rgba(var(--notiphy-blocker-color), 1);
+    text-shadow: 0 0 9px rgba(var(--notiphy-error-color), 1);
+    position: relative;
+    top: .2rem;
+
+}
+/* blocker notification title (modal) */
+#blocker-title {
+    font-family: var(--notiphy-primary-font-family);
+    font-weight: bold;
+    font-size: 1.5rem;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+
+}
+/* blocker notification text (modal) */
+#blocker-text {
+    font-family: var(--notiphy-primary-font-family);
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+/* Dismiss button appearing below the modal */
+#blocker-dismiss-button {
+    border:none;
+    border-radius: 6px;
+    background: linear-gradient(150deg, rgba(255, 255, 255, 1) 5%, rgba(255, 255, 255, 0.7) 100%); /* more opaque version of the inbox */
+    padding: .6rem 1.25rem;
+    color: rgba(0, 0, 0, .7);
+    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.3);
+    font-size: .85rem;
+    cursor: pointer;
+    transition: all .4s ease-in-out;
+    margin-left: auto;
+    bottom: -3rem;
+    position: absolute;
+    right: 0;
+    box-sizing: border-box;
+    /* border: 3px solid #FFF; */
+}
+#blocker-dismiss-button:hover {
+    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 1) 2%, rgba(255, 255, 255, .6) 97%);
+    /* border: 3px solid #FFF; */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* notification center (container) */
+#notiphy-notification-center {
+    bottom: 3rem;
+    right: 3.5rem;
+    min-width: 265px;
+    min-height: 150px;
+    max-height: calc(88vh - 3rem);
+    background: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%);
+    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.3);
+    border-radius: 11px;
+    z-index: 5000;
+    backdrop-filter: blur(10px);
+    transform: scale(0); /* Start with the inbox scaled down */
+    transform-origin: bottom right; /* Transform origin from the bottom right */
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Add transition for the scale transform and opacity */
+    opacity: 0; /* Start with the inbox hidden */
+    visibility: hidden; /* Ensure the inbox is not clickable when hidden */
+}
+#notiphy-notification-center.open {
+    transform: scale(1); /* Scale the inbox up when opened */
+    opacity: 1; /* Make the inbox visible */
+    visibility: visible; /* Make the inbox visible */
+}
+
+#notiphy-notification-center.close {
+    transform: scale(0); /* Scale the inbox down when closed */
+    opacity: 0; /* Make the inbox hidden */
+}
+
+#notiphy-notification-center.close .notiphy-notification-center-header,
+#notiphy-notification-center.close .notiphy-notification-center-footer {
+    opacity: 0; /* Fade out the header and footer when closing */
+}
+/* set our box-sizing */
+#notiphy-notification-center>*,
+#notiphy-notification-center>*>*,
+#notiphy-notification-center>*::before,
+#notiphy-notification-center>*::after,
+.notiphy-icon>*,
+.notiphy-icon>*::before,
+.notiphy-icon>*::after {
+    box-sizing: border-box;
+}
+
+/* inbox header. Contains title, audio, toast, and close buttons */
+.notiphy-notification-center-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 2.3rem;
+    background-color: rgba(245, 245, 245, 0.37);
+    background: linear-gradient(rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 1) 90%);
+    display: flex;
+    align-items: end;
+    padding: .3rem;
+    border-radius: 11px 11px 0 0;
+    border-bottom: 1px solid #ccc;
+    backdrop-filter: blur(10px);
+    z-index: 5001;
+}
+.notiphy-notification-center-header .notiphy-notification-center-title {
+    /* font-family: "Pacifico", cursive; */
+    /* color: rgb(255, 255, 255); */
+}
+
+/* top settings buttons */
+.notiphy-button-audio-alert,
+.notiphy-button-audio-reminder,
+.notiphy-button-show-toasts,
+.notiphy-button-close {
+    position:relative;
+    /* scale: .9; */
+    opacity: .7;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    font-weight: 300;
+}
+/* status indicators for settings buttons */
+.notiphy-button-audio-alert::after,
+.notiphy-button-audio-reminder::after,
+.notiphy-button-show-toasts::after{
+    position: absolute;
+    right: -2px;
+    top: -3px;
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    scale:.8;
+    border: 1px solid rgba(var(--notiphy-plain-color),1);
+    background-color: rgba(var(--notiphy-plain-color),1);
+    box-shadow: inset 0 1px #fafafa80, 0 0 3px 1px rgba(var(--notiphy-plain-color),.5);
+    border-radius: 50%;
+    transition: all 0.25s ease-in-out;
+}
+/* hover states */
+.notiphy-button-audio-alert:hover,
+.notiphy-button-audio-reminder:hover,
+.notiphy-button-show-toasts:hover,
+.notiphy-button-close:hover {
+    opacity: 1;
+}
+
+/* style close button hover affect */
+.notiphy-button-close:hover {
+    text-shadow: 0 0 6px rgba(var(--notiphy-error-color), 1);
+    
+}
+
+/* position audio alert button to the right */
+.notiphy-button-audio-alert {
+    margin-left: auto;
+}
+
+/* notiphy settings enabled state (audio alert, toasts) */
+.notiphy-enabled {
+    opacity: 1;
+    font-weight: normal;
+}
+.notiphy-button-audio-alert.notiphy-enabled::after,
+.notiphy-button-audio-reminder.notiphy-enabled::after,
+.notiphy-button-show-toasts.notiphy-enabled::after {
+    scale:1;
+    border: 1px solid rgba(var(--notiphy-plain-color),1);
+    background-color: rgba(var(--notiphy-success-color),1);
+    box-shadow: inset 0 1px #fafafa80, 0 0 3px 1px rgba(var(--notiphy-success-color),.5);
+}
+/* add some space between inbox and connection stats */
+.notiphy-notification-center-connection {
+    margin-left: 2rem;
+}
+
+/* inbox body */
+.notiphy-notification-center-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0; 
+    bottom: 0;
+    margin-top:11px;
+    padding-top: calc(2.3rem - 11px);
+    padding-bottom: 2rem;
+    border-radius: 11px;
+    overflow-y: scroll;
+}
+
+/* Scrollbar styles */
+
+/* Firefox (uncomment to work in Firefox, although other properties will not work!)  */
+/** {
+  scrollbar-width: thin;
+  scrollbar-color: #B5B5B5 #FFFFFF;
+}*/
+
+/* Chrome, Edge and Safari */
+.notiphy-notification-center-body::-webkit-scrollbar {
+    height: 3px;
+    width: 3px;
+  }
+  .notiphy-notification-center-body::-webkit-scrollbar-track {
+    border-radius: 3px;
+    background-color: transparent;
+  }
+  
+  .notiphy-notification-center-body::-webkit-scrollbar-track:hover {
+    background-color: transparent;
+  }
+  
+  .notiphy-notification-center-body::-webkit-scrollbar-track:active {
+    background-color: transparent;
+  }
+  
+  .notiphy-notification-center-body::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: #B5B5B5;
+  }
+  
+  .notiphy-notification-center-body::-webkit-scrollbar-thumb:hover {
+    background-color: #B5B5B5;
+  }
+  
+  .notiphy-notification-center-body::-webkit-scrollbar-thumb:active {
+    background-color: #B5B5B5;
+  }
+  
+/* inbox footer. Contains logo and mark all as read button */
+.notiphy-notification-center-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 2rem;
+    font-family: var(--notiphy-logo-font-family);
+    font-size: 1.15rem;
+    color: rgba(186, 186, 186, 1);
+    background-color: rgba(245, 245, 245, 0.37);
+    background: linear-gradient(rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 1) 90%);
+    border-bottom-left-radius: 11px;
+    border-bottom-right-radius: 11px;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+/* Footer buttons - Mark All Read and Dismiss All */
+.notiphy-notification-center-footer i {
+    color: rgba(0, 0, 0, 1) ;
+    font-size: 1.15rem;
+    cursor:pointer;
+    opacity: .5;
+}
+.notiphy-notification-center-footer i:hover {
+    opacity:1;
+}
+
+/* mark all read button */
+.notiphy-button-mark-all-read {
+    margin-left:.3rem;
+}
+
+/* button divider */
+.notiphy-button-divider {
+    border-left:1px solid #ccc;
+    height:1.5rem;
+    margin-left:.3rem;
+    margin-right:.3rem;
+
+}
+
+/* Dismiss ALL button */
+.notiphy-button-dismiss-all {
+    margin-right:auto;
+    font-size:1.35rem!important;
+}
+
+/* logo in footer */
+.notiphy-notification-center-logo {
+    display:block;
+    position:fixed;
+}
+
+/* status indicator light */
+.notiphy-notification-center-connect-status {
+    margin-right: .75rem;
+    width: 10px;
+    height: 10px;
+    border:1px solid rgba(var(--notiphy-plain-color),1);
+    background-color: rgba(var(--notiphy-error-color),1);
+    box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5),
+    0px 0px 3px 2px rgba(var(--notiphy-error-color),0.5);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* status indicator - connected state */
+.notiphy-notification-center-connect-status.connected {
+    background-color: rgba(var(--notiphy-info-color), 1);
+    box-shadow: inset 0px 1px 0px 0px rgba(250, 250, 250, 0.5),
+        0px 0px 3px 2px rgba(var(--notiphy-info-color), 0.5);
+}
+
+/* inbox and connection stats that display below notification center */
+/* Hidden for now */
+.notiphy-notification-center-stats {
+    position: relative;
+    width: 100%;
+    color: rgba(0, 0, 0, 0.5);
+    height: 1.2rem;
+    padding: 0 0.2rem 0.3rem;
+    font-size: .7rem;
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    /* backdrop-filter: blur(10px); */
+    z-index: 5001;
+}
+
+
+/* Inbox notifications */
+/* Notification outer container (inbox) */
+.notiphy-notification-element {
+    position:relative;
+    background-color: #FFF;
+    border-bottom: 1px solid #e6e6e6;
+    display: flex;
+}
+
+/* Left-side icons in the notification elements, styled according to alert level */
+.notiphy-notification-element.notiphy-warning .notiphy-notification-left:first-child {
+    background: rgba(var(--notiphy-warning-color), 1);
+}
+
+.notiphy-notification-element.notiphy-success .notiphy-notification-left:first-child {
+    background: rgba(var(--notiphy-success-color), 1);
+}
+
+.notiphy-notification-element.notiphy-error .notiphy-notification-left:first-child {
+    background: rgba(var(--notiphy-error-color), 1);
+}
+
+.notiphy-notification-element.notiphy-info .notiphy-notification-left:first-child {
+    background: rgba(var(--notiphy-info-color), 1);
+}
+
+.notiphy-notification-element.notiphy-primary .notiphy-notification-left:first-child {
+    background: rgba(var(--notiphy-primary-color), 1);
+}
+.notiphy-notification-element.notiphy-blocker .notiphy-notification-left:first-child {
+    background: rgba(var(--notiphy-blocker-color), 1);
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(221, 86, 33, 0.4);
+    }
+
+    50% {
+        transform: scale(1);
+
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(33, 131, 221, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(33, 131, 221, 0);
+    }
+}
+
+/* hover notification in inbox */
+.notiphy-notification-element:hover {
+    background-color: #f5f5f5!important;
+    cursor: pointer;
+}
+
+/* left column, notification icon/avatar */
+.notiphy-notification-left {
+    float: left;
+    height: 100%;
+    min-width: 2.5rem;
+    max-width: 2.5rem;
+    aspect-ratio: 1/1;
+    display: flex;
+    border-radius: 50%;
+    color:#FFF;
+    background-color: #cfcfcf;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
+}
+
+/* center notification icon/avatar vertically */
+.notiphy-notification-left:first-child {
+    /* border-radius:50% 0 0 50%; */
+    /* padding:.2rem; */
+    margin: auto .5rem;
+}
+
+/* set font size for notification icon/avatar */
+.notiphy-notification-left .material-symbols-outlined {
+    font-size: 1.4rem;
+}
+
+/* right column, main notification (inbox) */
+.notiphy-notification-right {
+    /* padding-left:.3rem; */
+    flex-grow: 1;
+    padding: .5rem .3rem 0.3rem;
+}
+
+/* notification header (inbox) */
+.notiphy-notification-header {
+    font-weight: bold;
+    font-size: .9rem;
+}
+
+/* notification actions (mark-read, dismiss) */
+.notiphy-notification-actions {
+    float: right;
+    font-size: .5rem !important;
+}
+
+/* set font size for notification action buttons */
+.notiphy-notification-actions .material-symbols-outlined {
+    font-size: 1rem !important;
+}
+/* read notifications appear faded */
+.notiphy-notification-element.notiphy-read {
+    background-color: #f5f5f5!important;
+    /* opacity: .7; */
+}
+/* also reduce opacity of icon */
+.notiphy-notification-element.notiphy-read .notiphy-notification-left:first-child {
+    color:rgba(255,255,255,.5);
+}
+
+/* notification action buttons themselves */
+.notiphy-button-mark-read, .notiphy-button-dismiss {
+    cursor: pointer;
+    padding-left:.25rem;
+    padding-right:.25rem;
+    transition:all 0.25s ease-in-out;
+}
+
+/* mark-read button hover */
+.notiphy-button-mark-read:hover {
+    opacity: 1;
+    scale: 1.375;
+}
+
+/* mark-read button "read" state */
+.notiphy-button-mark-read.open {
+    opacity: 1;
+    color: rgba(0, 70, 0, 1);
+}
+
+/* dismiss button */
+/* .notiphy-button-dismiss {
+    float: right;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 1;
+    margin-left: 0.5rem;
+} */
+
+/* dismiss button hover */
+.notiphy-button-dismiss:hover {
+    opacity: 1;
+    scale: 1.375;
+}
+
+
+
+/* notification body (inbox) */
+.notiphy-notification-body {
+    font-size: .75rem;
+}
+
+/* notification footer (inbox) */
+.notiphy-notification-footer {
+    font-size: .67rem;
+    text-align: right;
+    color: rgba(0, 0, 0, 0.5);
+}
