@@ -3,6 +3,9 @@
 ## Overview
 The Notiphy Widget is an embeddable Javascript component that is designed to integrate Notiphy.me notifications into your web applications. It provides real-time notifications and flexible configuration options.
 
+#### Live Demo
+See the widget in action at https://notiphy.me/demo/
+
 ## Installation
 The easiest way to add the Notiphy widget is to use the CDN links below to include the widget in your HTML.
 
