@@ -44,7 +44,7 @@ export default class NotiphyWidget {
     constructor(config) {
         this.config = {
             // serviceUrl: config.serviceUrl || 'https://notiphy.me',
-            serviceUrl: config.serviceUrl || 'http://app.notiphy.me',
+            serviceUrl: config.serviceUrl || 'https://app.notiphy.me',
             tenant: config.tenant || null,
             widgetKey: config.widgetKey || null,
             locationId: config.locationId || "default",

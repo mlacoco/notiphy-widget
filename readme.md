@@ -10,6 +10,8 @@ The easiest way to add the Notiphy widget is to use the CDN links below to inclu
 ### CDN (JSDelivr)
  
 - `https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@1.0.0/dist/notiphy-widget.umd.js`
+
+
 - `https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@1.0.0/dist/style.css`
 
 ```html
@@ -28,7 +30,7 @@ The easiest way to add the Notiphy widget is to use the CDN links below to inclu
 
 1. **Clone the Repository**
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/mlacoco/notiphy-widget.git
     cd notiphy-widget
     ```
 
@@ -50,7 +52,7 @@ The easiest way to add the Notiphy widget is to use the CDN links below to inclu
 ## Usage
 
 ### Initialization
-To initialize the Notiphy Widget, include the generated JavaScript and css files from the `dist` folder in your HTML, and configure the widget as follows:
+To initialize the Notiphy Widget, include the generated JavaScript and css files from the `dist` folder (or CDN) in your HTML, and configure the widget as follows:
 
 ```html
 <!DOCTYPE html>
