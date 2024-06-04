@@ -36,14 +36,12 @@ import ping from '../assets/audio/ping.mp3';
 import pop from '../assets/audio/pop.mp3';
 import start from '../assets/audio/start.mp3';
 import whoosh from '../assets/audio/whoosh.mp3';
-
-// Import the CSS file
-import '../styles/main.css';
+import '../styles/notiphy.css';
 
 export default class NotiphyWidget {
     constructor(config) {
-        this.config = {
-            // serviceUrl: config.serviceUrl || 'https://notiphy.me',
+        this.config = this.loadSettings() || {
+            // default settings
             serviceUrl: config.serviceUrl || 'https://app.notiphy.me',
             tenant: config.tenant || null,
             widgetKey: config.widgetKey || null,
@@ -54,12 +52,13 @@ export default class NotiphyWidget {
             reminderInterval: config.reminderInterval || 180,
             toastAlert: config.toastAlert || false,
             toastPosition: config.toastPosition || "bottom-right",
-            toastDuration: config.toastDuration || 4, // Default toast duration is 4 seconds
+            toastDuration: config.toastDuration || 4,
             width: config.width || "300px",
             height: config.height || "400px",
             showInboxOnLoad: config.showInboxOnLoad || false,
             refreshInterval: config.refreshInterval || 0
         };
+        this.saveSettings();
         
         // Check for required fields
         if (!this.config.tenant) {
@@ -78,6 +77,21 @@ export default class NotiphyWidget {
         this.createDomElements();
         this.setupPeriodicRefresh(); // Refresh the notifications every so often to check for expired notifications.
         this.setupAudioReminders(); // Play a reminder sound if there are unread notifications.
+    }
+
+    /**
+     * Saves user preferences (audio, toast, reminders)
+     */
+    saveSettings() {
+        localStorage.setItem('notiphySettings', JSON.stringify(this.config));
+    }
+
+    /**
+     * Loads user preferences (audio, toast, reminders)
+     */
+    loadSettings() {
+        const settings = localStorage.getItem('notiphySettings');
+        return settings ? JSON.parse(settings) : null;
     }
 
     /**
@@ -124,14 +138,16 @@ export default class NotiphyWidget {
         ioScript.src = "https://cdn.socket.io/4.0.0/socket.io.min.js";
         ioScript.onload = () => this.onSocketIoLoaded();
         document.head.appendChild(ioScript);
-
-        // Get the CSS for the widget. // now handled by Vite.
-        // We could also just inject the cdn link to the css file too. That might be best.
-
+        
         // const stylesheet = document.createElement("link");
         // stylesheet.setAttribute("rel", "stylesheet");
-        // stylesheet.setAttribute("href", `${this.config.serviceUrl}/widget/v1/css`);
+        // stylesheet.setAttribute("href", `/dist/style.css`);
         // document.head.appendChild(stylesheet);
+
+        // add notiphyStyles to document
+        // document.head.appendChild(document.createElement("style"));
+        // document.head.querySelector("style").innerHTML = notiphyStyles;
+
 
         // Create the widget icon. This is what the user clicks on to toggle the inbox.
         const notificationIcon = document.createElement("div");
@@ -148,32 +164,80 @@ export default class NotiphyWidget {
         // Create the notification center (Inbox). This is the element that contains all [not:dismissed] notifications.
         const notificationCenter = document.createElement("div");
         notificationCenter.id = "notiphy-notification-center";
-        notificationCenter.style.width = !this.config.width ? "300px" : this.config.width;
-        notificationCenter.style.height = !this.config.height? "400px" : this.config.height;
+        notificationCenter.style.width = this.config.width || "300px";
+        notificationCenter.style.height = this.config.height || "400px";
         notificationCenter.innerHTML = ``
-        +`<div class="notiphy-notification-center-header">`
-        +   `<span class="notiphy-notification-center-stats-unread">0</span> <span class="notiphy-notification-center-title">${this.config.widgetTitle}</span>`
-        +   `<i class="notiphy-button-audio-alert${this.config.audioAlert ? " notiphy-enabled" : ""} material-symbols-outlined" title="${this.config.audioAlert ? "Sound on" : "Muted"}">${this.config.audioAlert ? " volume_up" : "volume_off"}</i>`
-        +   `<i class="notiphy-button-divider"></i>`
-        +   `<i class="notiphy-button-audio-reminder${this.config.audioReminder ? " notiphy-enabled" : ""} material-symbols-outlined" title="${this.config.audioReminder ? "Reminders on" : "Reminders off"}">${this.config.audioReminder ? "alarm_on" : "alarm_off"}</i>`
-        +   `<i class="notiphy-button-divider"></i>`
-        +   `<i class="notiphy-button-show-toasts${this.config.toastAlert ? " notiphy-enabled" : ""} material-symbols-outlined" title="Toast notifications">position_top_right</i>`
-        +   `<i class="notiphy-button-divider"></i>`
-        +   `<i class="notiphy-button-close material-symbols-outlined" title="Close">close</i>`
-        +`</div>`
-        +`    <div class="notiphy-notification-center-body"></div>`
-        +`<div class="notiphy-notification-center-footer">`
-        +   `<i class="notiphy-button-mark-all-read material-symbols-outlined" title="Mark ALL read">mark_chat_read</i>`
-        +   `<i class="notiphy-button-divider"></i>`
-        +   `<i class="notiphy-button-dismiss-all material-symbols-outlined" title="Dismiss ALL">delete_sweep</i>`
-        // +   `<span class="notiphy-notification-center-logo">Notiphy.me</span>`
-        +   `<span class="notiphy-notification-center-connect-status" title="Offline"></span>`
-        +`</div>`
-        +`<div class="notiphy-notification-center-stats">`
-        +   `Inbox: <span class="notiphy-notification-center-stats-total">0</span>`
-        +   `<span class="notiphy-notification-center-connection"></span>`
-        +`</div>`
+            + `<div class="notiphy-notification-center-header">`
+            + `<span class="notiphy-notification-center-stats-unread">0</span> <span class="notiphy-notification-center-title">${this.config.widgetTitle}</span>`
+            + `<i class="notiphy-button-settings material-symbols-outlined" title="Settings">settings</i>`
+            + `<i class="notiphy-button-divider"></i>`
+            + `<i class="notiphy-button-close material-symbols-outlined" title="Close">close</i>`
+            + `</div>`
+            + `<div class="notiphy-settings-dropdown">`
+            + `<div class="notiphy-settings-dropdown-item" id="audio-alert-item">`
+            + `Audio Alert <i class="notiphy-button-audio-alert material-symbols-outlined ${this.config.audioAlert ? 'notiphy-enabled' : ''}" title="${this.config.audioAlert ? 'Sound on' : 'Muted'}">${this.config.audioAlert ? 'volume_up' : 'volume_off'}</i>`
+            + `</div>`
+            + `<div class="notiphy-settings-dropdown-item" id="audio-reminder-item">`
+            + `Audio Reminder <i class="notiphy-button-audio-reminder material-symbols-outlined ${this.config.audioReminder ? 'notiphy-enabled' : ''}" title="${this.config.audioReminder ? 'Reminders on' : 'Reminders off'}">${this.config.audioReminder ? 'alarm_on' : 'alarm_off'}</i>`
+            + `</div>`
+            + `<div class="notiphy-settings-dropdown-item" id="toast-alert-item">`
+            + `Toast Alert <i class="notiphy-button-show-toasts material-symbols-outlined ${this.config.toastAlert ? 'notiphy-enabled' : ''}" title="Toast notifications">position_top_right</i>`
+            + `</div>`
+            + `<div class="notiphy-settings-dropdown-item" id="toast-position-item">`
+            + `Toast Position <span class="notiphy-button-toast-position material-symbols-outlined">${this.getToastPositionIcon()}</span>`
+            + `</div>`
+            + `</div>`
+            + `<div class="notiphy-notification-center-body"></div>`
+            + `<div class="notiphy-notification-center-footer">`
+            + `<i class="notiphy-button-mark-all-read material-symbols-outlined" title="Mark ALL read">mark_chat_read</i>`
+            + `<i class="notiphy-button-divider"></i>`
+            + `<i class="notiphy-button-dismiss-all material-symbols-outlined" title="Dismiss ALL">delete_sweep</i>`
+            + `<span class="notiphy-notification-center-logo">Notiphy.me</span>`
+            + `<span class="notiphy-notification-center-connect-status" title="Offline"></span>`
+            + `</div>`
+            + `<div class="notiphy-notification-center-stats">`
+            + `Inbox: <span class="notiphy-notification-center-stats-total">0</span>`
+            + `<span class="notiphy-notification-center-connection"></span>`
+            + `</div>`;
         document.body.appendChild(notificationCenter);
+        // Create the settings dropdown menu
+        const settingsButton = document.querySelector('.notiphy-button-settings');
+        const settingsDropdown = document.querySelector('.notiphy-settings-dropdown');
+        settingsButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            settingsDropdown.classList.toggle('show');
+        });
+        // Add event listener to close the dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
+                settingsDropdown.classList.remove('show');
+            }
+        });
+
+        // This ensures that clicking on the .notiphy-settings-dropdown-item elements triggers the corresponding button click events.
+        document.getElementById('audio-alert-item').addEventListener('click', () => {
+            this.toggleAudioAlert();
+            this.updateSettingsDropdown();
+        });
+        
+        document.getElementById('audio-reminder-item').addEventListener('click', () => {
+            this.toggleAudioReminder();
+            this.updateSettingsDropdown();
+        });
+        
+        document.getElementById('toast-alert-item').addEventListener('click', () => {
+            this.toggleToastAlert();
+            this.updateSettingsDropdown();
+        });
+        
+        document.getElementById('toast-position-item').addEventListener('click', () => {
+            this.changeToastPosition();
+            this.updateSettingsDropdown();
+        });
+
+        const closeButton = document.querySelector('.notiphy-button-close');
+        closeButton.addEventListener('click', () => this.toggleNotificationCenter());
+   
 
         // create the blocker modal.
         const blockerModal = document.createElement("div");
@@ -194,6 +258,25 @@ export default class NotiphyWidget {
         document.body.appendChild(blockerModal);
     }
 
+    getToastPositionIcon() {
+        const positionIcons = {
+            'bottom-right': 'south_east',
+            'bottom-center': 'south',
+            'bottom-left': 'south_west',
+            'top-right': 'north_east',
+            'top-center': 'north',
+            'top-left': 'north_west'
+        };
+        return positionIcons[this.config.toastPosition] || 'south_east';
+    }
+
+    updateSettingsDropdown() {
+        document.querySelector('.notiphy-button-audio-alert').innerHTML = this.config.audioAlert ? 'volume_up' : 'volume_off';
+        document.querySelector('.notiphy-button-audio-reminder').innerHTML = this.config.audioReminder ? 'alarm_on' : 'alarm_off';
+        document.querySelector('.notiphy-button-show-toasts').innerHTML = 'position_top_right';
+        const toastPositionButton = document.querySelector('.notiphy-button-toast-position');
+        toastPositionButton.innerHTML = this.getToastPositionIcon();
+    }
     
     /**
      * Handles the event when Socket.IO is loaded and connected.
@@ -264,6 +347,7 @@ export default class NotiphyWidget {
         }
         setTimeout(() => {
              this.addToNotiphyCenter(notification); // add to inbox
+             this.playPopSound(); // play pop sound
         }, delay);
     }
 
@@ -390,18 +474,6 @@ export default class NotiphyWidget {
     setupEventListeners() {
         const icon = document.querySelector(".notiphy-icon");
         icon.addEventListener("click", () => this.toggleNotificationCenter());
-    
-        const closeButton = document.querySelector(".notiphy-button-close");
-        closeButton.addEventListener("click", () => this.toggleNotificationCenter());
-    
-        const audioButton = document.querySelector(".notiphy-button-audio-alert");
-        audioButton.addEventListener("click", () => this.toggleAudioAlert());
-
-        const audioReminderButton = document.querySelector(".notiphy-button-audio-reminder");
-        audioReminderButton.addEventListener("click", () => this.toggleAudioReminder());
-    
-        const toastButton = document.querySelector(".notiphy-button-show-toasts");
-        toastButton.addEventListener("click", () => this.toggleToastAlert());
 
         const dismissAllButton = document.querySelector(".notiphy-button-dismiss-all");
         dismissAllButton.addEventListener("click", () => this.dismissAllNotifications());
@@ -585,28 +657,6 @@ export default class NotiphyWidget {
         const notificationElement = document.createElement("div");
         notificationElement.className = `notiphy-notification-element${notification.read ? " notiphy-read" : ""}${!notification.alertLevel ? `` : ` notiphy-${notification.alertLevel}`}`;
         
-        // let startTime = Date.now();
-        // let remainingTime = (notification.ttl * 1000 || 86400); // default to 86,400 (24 hours)
-        // const uniqueClass = `notification-duration-${Date.now()}`;
-        // const alertLevel = notification.alertLevel || 'info'; // default to info color
-        // const alertColorVariable = `--notiphy-${alertLevel}-color`;
-    
-        // // Create a style tag with the unique class
-        // const style = document.createElement('style');
-        // style.innerHTML = ``
-        //     + `.${uniqueClass} .progress:before {`
-        //     + `animation: progress ${remainingTime}ms linear forwards !important;`
-        //     + `background-color: rgba(var(${alertColorVariable}), 1) !important;`
-        //     + `}`
-        //     + `.${uniqueClass}.paused .progress:before {`
-        //     + `animation-play-state: paused !important;`
-        //     + `}`;
-        // document.head.appendChild(style);
-    
-        // // Add the unique class to the notification element
-        // notificationElement.classList.add(uniqueClass);
-        // notificationElement.__styleElement = style; // Store reference to remove later
-        
         notificationElement.innerHTML = ``
         + `<div class='notiphy-notification-left'>`
         + `<i class="material-symbols-outlined">${notification.alertLevel == 'blocker' ? 'crisis_alert' : notification.read ? "notifications" : "notifications_unread"}</i>`
@@ -614,24 +664,14 @@ export default class NotiphyWidget {
         + `<div class='notiphy-notification-right'>`
         + `<div class='notiphy-notification-actions'>`
         + `<i class="notiphy-button-mark-read material-symbols-outlined${notification.read ? " open" : ""}" title="Mark as read" data-notification-id="${notification.id}">${notification.read ? "mark_chat_read" : "mark_chat_unread"}</i>`
-        + `<i class="notiphy-button-dismiss material-symbols-outlined" title="Dismiss" data-notification-id="${notification.id}">close</i>`
+        + `<i class="notiphy-button-dismiss material-symbols-outlined" title="Dismiss" data-notification-id="${notification.id}">delete_forever</i>`
         + `</div>`
         + `<div class='notiphy-notification-header'>${notification.title}</div>`
         + `<div class='notiphy-notification-body'${notification.actionUrl ? ` onclick="location.href='${notification.actionUrl}';"` : ""}>${notification.text}</div>`
         + `<div class='notiphy-notification-footer'></div>`
-        + `</div>`
-        // + `<div class="progress active"></div>`
-        ;
+        + `</div>`;
 
         const inbox = document.querySelector(".notiphy-notification-center-body");
-
-        // setTimeout(() => {
-        //     inbox.removeChild(notificationElement);
-        //     document.head.removeChild(style);
-        //     if (notificationElement.__styleElement) {
-        //         notificationElement.__styleElement.remove();
-        //     }
-        // }, remainingTime);
     
         // Update the footer after the element is fully created
         this.updateNotificationFooter(notificationElement.querySelector('.notiphy-notification-footer'), notification._ts); // '_ts' is the timestamp of the notification, as indicated by the database.
@@ -681,7 +721,7 @@ export default class NotiphyWidget {
 
         if (!notification.read) {
             this.updateUnreadCount(parseInt(unreadCount.textContent) + 1);
-            this.playPopSound();
+            // this.playPopSound();
         }
         totalCount.innerHTML = parseInt(totalCount.innerHTML) + 1;
     }
@@ -740,10 +780,13 @@ export default class NotiphyWidget {
                     this.toggleNotificationCenter();
                 }
                 this.notificationsLoaded = true;
+                const unreadCount = document.querySelector(".notiphy-notification-center-stats-unread");
+                if (parseInt(unreadCount.textContent) > 0) {
+                    this.playPopSound();
+                }
             })
             .catch((error) => console.error("Failed to fetch notifications:", error));
     }
-
 
     /**
      * Toggles the visibility of the inbox element.
@@ -772,7 +815,6 @@ export default class NotiphyWidget {
         const notificationBody = document.querySelector(".notiphy-notification-center-body");
         notificationBody.scrollTo({ top: 0, behavior: "smooth" });
     }
-
 
     /**
      * Marks a notification as read and updates the unread count.
@@ -812,18 +854,18 @@ export default class NotiphyWidget {
             });
     }
 
-
     /**
      * Reuses markRead() to mark all notifications as read.
      */
     markAllRead() {
         const markReadButtons = document.querySelectorAll(".notiphy-button-mark-read");
-        Array.from(markReadButtons).forEach((button) => {
-            this.markRead(button.dataset.notificationId, button);
+        Array.from(markReadButtons).forEach((button, index) => {
+            setTimeout(() => {
+                this.markRead(button.dataset.notificationId, button);
+                this.playClickOffSound();
+            }, index * 150); // short delay between each iteration
         });
-        
     }
-
 
     /**
      * Dismisses a notification from the UI and updates the total and unread notification counts.
@@ -878,11 +920,12 @@ export default class NotiphyWidget {
      */
     dismissAllNotifications() {
         const dismissButtons = document.querySelectorAll(".notiphy-button-dismiss");
-        Array.from(dismissButtons).forEach((button) => {
-            const notificationId = button.dataset.notificationId;
-            this.dismissNotification(notificationId, button);
+        Array.from(dismissButtons).forEach((button, index) => {
+            setTimeout(() => {
+                const notificationId = button.dataset.notificationId;
+                this.dismissNotification(notificationId, button);
+            }, index * 50); // short delay between each iteration
         });
-        
             this.playCrumpleSound();
     }
     
@@ -895,21 +938,12 @@ export default class NotiphyWidget {
         this.config.audioAlert = !this.config.audioAlert;
         const button = document.querySelector(".notiphy-button-audio-alert");
         button.classList.toggle("notiphy-enabled");
-        if (button.title === "Sound on") {
-            button.title = "Sound off";
-        } else {
-            button.title = "Sound on";
-        }
-        if (this.config.audioAlert) {
-            this.playClickOnSound();
-            button.innerHTML = "volume_up";
-        } else {
-            this.playClickOffSound();
-            button.innerHTML = "volume_off";
-        }
+        button.title = this.config.audioAlert ? "Sound on" : "Sound off";
+        button.innerHTML = this.config.audioAlert ? "volume_up" : "volume_off";
+        this.config.audioAlert ? this.playClickOnSound() : this.playClickOffSound();
         console.log("Sound", this.config.audioAlert ? "on" : "off");
+        this.saveSettings(); // Save settings after change
     }
-
 
     /**
      * Toggles audible Reminders for unread messages
@@ -918,30 +952,19 @@ export default class NotiphyWidget {
         this.config.audioReminder = !this.config.audioReminder;
         const button = document.querySelector(".notiphy-button-audio-reminder");
         button.classList.toggle("notiphy-enabled");
-        
-        
-            if (this.config.audioReminder) {
-                this.playClickOnSound();
-            } else {
-                this.playClickOffSound();
-            }
-        
+        button.title = this.config.audioReminder ? "Reminders on" : "Reminders off";
+        button.innerHTML = this.config.audioReminder ? "alarm_on" : "alarm_off";
         if (this.config.audioReminder) {
-            button.title = "Reminders on";
-            button.innerHTML = "alarm_on";
             this.setupAudioReminders();
+            this.playClickOnSound();
         } else {
-            button.title = "Reminders off";
-            button.innerHTML = "alarm_off";
-            if (this.reminderIntervalId) {
-                console.log("Reminders off: Clearing interval");
-                clearInterval(this.reminderIntervalId);
-                this.reminderIntervalId = null;
-            }
+            clearInterval(this.reminderIntervalId);
+            this.reminderIntervalId = null;
+            this.playClickOffSound();
         }
+        this.saveSettings(); // Save settings after change
     }
-
-
+    
     /**
      * Toggles toast notifications on or off. If off, notifications will not be displayed as toasts and appear only in the inbox.
      */
@@ -949,14 +972,23 @@ export default class NotiphyWidget {
         this.config.toastAlert = !this.config.toastAlert;
         const button = document.querySelector(".notiphy-button-show-toasts");
         button.classList.toggle("notiphy-enabled");
-        if (this.config.toastAlert) {
-                this.playClickOnSound();
-            } else {
-                this.playClickOffSound();
-            }
+        this.config.toastAlert ? this.playClickOnSound() : this.playClickOffSound();
         console.log("Toasts", this.config.toastAlert ? "on" : "off");
+        this.saveSettings(); // Save settings after change
     }
 
+    /**
+     * Toggles the position of toast notifications.
+     */
+    changeToastPosition() {
+        const positions = ['top-left', 'top-center', 'top-right', 'bottom-right', 'bottom-center', 'bottom-left'];
+        const currentIndex = positions.indexOf(this.config.toastPosition);
+        this.config.toastPosition = positions[(currentIndex + 1) % positions.length];
+        document.querySelector('.notiphy-toaster').className = `notiphy-toaster ${this.config.toastPosition}`;
+        console.log("Toast Position", this.config.toastPosition);
+        this.saveSettings(); // Save settings after change
+        this.updateSettingsDropdown();
+    }
 
     /**
      * Plays a notification sound to alert the user of a new notification.
@@ -1074,7 +1106,6 @@ export default class NotiphyWidget {
         
     }
 
-
     /**
      * Updates the connection status display in the notification center.
      *
@@ -1103,7 +1134,6 @@ export default class NotiphyWidget {
         }
     }
 
-
     /**
      * Updates the unread notification count displayed in the widget icon.
      *
@@ -1122,7 +1152,6 @@ export default class NotiphyWidget {
         count > 0 ? notificationIcon.classList.add("notiphy-icon-unread") : notificationIcon.classList.remove("notiphy-icon-unread");
         count > 0 ? notificationIcon.firstChild.textContent = "notifications_active" : notificationIcon.firstChild.textContent = "notifications";
     }
-
 
     /**
      * Updates the total count of notifications.

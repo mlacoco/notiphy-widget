@@ -217,12 +217,10 @@
             text-decoration: underline;
         }
     </style>
-    <!-- <link rel="stylesheet" href="dist/style.css">
-    <script src="dist/notiphy-widget.umd.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/notiphy-widget.umd.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/style.css">
+    <script src="dist/notiphy-widget.umd.js"></script>
+    <link rel="stylesheet" href="/dist/style.css">
     <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>@media (prefers-color-scheme: light){ :root{ filter: none;}}@media (prefers-color-scheme: dark){ :root{ filter: invert(100%);}}</style><path d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6'/></svg>">
- </head>
+</head>
 
 <body>
     <div class="logo">
@@ -230,31 +228,32 @@
 
     </div>
     <div class="container">
-        <h1>Notiphy Inbox</h1>
-        <p>The absolute simplest way to add notifications and an inbox to your app or website.</p>
+        <h1>The Notiphy widget</h1>
+        <p>A really easy way to add toasts, alerts, and an inbox to store them all in to your app or website.</p>
 
         <div class="callout">
             <h4>Features</h4>
-            <ol>
-                <li>Use the API to send a notification in JSON format.</li>
-                <li>Notifications can be sent to a specific location, or all tenant locations.</li>
-                <li>Add the notification center anywhere by embedding the Javascript widget.</li>
-                <li>Configure the widget to show toasts, or play an audio alert.</li>
-                <li>Notifications can be marked read, or dismissed (discards from notification center).</li>
-                <li>User activity is synchronised accross widgets initialized for the same location.</li>
-                <li>By default, notifications have a TTL of 24 hours.</li>
-            </ol>
+            <ul>
+                <li>A single Javascript file in your HTML.</li>
+                <li>Assign the widget to a specific user, or group of users.</li>
+                <li>Specify if, where on the screen, and for how long toast notifications appear.</li>
+                <li>Configure audio alerts and audible reminders for urgent notifications (try silent reminders!).</li>
+                <li>Notifications can be marked read, or dismissed to remove from the Inbox.</li>
+                <li>User activity is synchronised accross widgets initialized for the same user/group.</li>
+            </ul>
         </div>
 
-        <h4>The Notiphy Widget</h4>
+        <h4>Live demo, right now.</h4>
         <p>
-            The Javascript widget provides a complete inbox for your app or website, just paste the widget script
-            Notiphy generates for you at the end of any page you want to include Notiphy in.
+            There's a live widget in action at the bottom-right. 
+            You can interact with it, and see how it works. 
+            You can also try it out yourself, below.
         </p>
-        <p>The widget on this page is initialized for location 101 at tenant acme.</p>
+        
         <div class="tryitout">
             <!-- Try it out button -->
-            <button id="tryItOutButton" class="tryit-btn">Try it out</button>
+            <button id="tryItOutButton" class="tryit-btn">Send a notification</button>
+            <a class="tryit-btn" id="tryBlockerButton">Try a blocker</a>
         </div>
         <h4>Embed the widget</h4>
         <p>Include the widget and it's CSS in your document's <span class="inline-pre">&lt;head></span> section.</p>
@@ -262,17 +261,16 @@
 
         &lt;head>
             ...
-            &lt;link rel="stylesheet" href="path/to/style.css">
             &lt;script src="path/to/notiphy-widget.umd.js">&lt;/script>
+            ...
         &lt;/head>
         </pre>
         <h5>Or CDN</h5>
         <ul>
-            <li>CSS: <span class="inline-pre">https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/style.css</span></li>
-            <li>JS: <span class="inline-pre">https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/notiphy-widget.umd.js</span></li>
+            <li>JS: <span class="inline-pre">https://cdn.notiphy.me/notiphy-widget@latest/notiphy-widget.umd.js</span></li>
         </ul>
         
-        <p>Initialize the widget before your closing <span class="inline-pre">&lt;/body></span> tag.</p>
+        <p>Initialize the widget before your closing <span class="inline-pre">&lt;/body></span> tag. The example below shows the minimal config, loading default settings.</p>
         <pre>
 
         &lt;body>
@@ -281,7 +279,7 @@
             ...
             &lt;script>
             const notiphyConfig = {
-                    tenant: 'your-tenant-id',
+                    notiphyId: 'your-notiphy-id',
                     widgetKey: 'widget-api-key',
                     }
 
@@ -294,12 +292,12 @@
         <div class="callout">
             <h4>Config parameters</h4>
             <ol class="mono">
-                <li>tenant .......... [Required] The tenant ID for the notification service.</li>
+                <li>notiphyId ....... [Required] The subscriber ID for the notification service.</li>
                 <li>widgetKey ....... [Required] The widget API key for the notification service.</li>
-                <li>locationId ...... The location ID for the Widget (default: 'default').</li>
+                <li>userId .......... The user/location ID for the Widget (default: 'default').</li>
                 <li>widgetTitle ..... Custom title to be displayed in the Inbox.</li>
-                <li>audioAlert ...... Enable audio (off by default)</li>
-                <li>audioReminder ... Audible reminder of unread notifications at the specified interval (off by
+                <li>audioAlert ...... true/false. Sound on/off (off by default)</li>
+                <li>audioReminder ... true/false. Audible reminder of unread notifications on/off (off by
                     default).</li>
                 <li>reminderInterval. Interval in seconds to play the reminder (default: 180/3minutes, no minimum).</li>
                 <li>toastAlert ...... Show toast notifications (off by default).</li>
@@ -312,42 +310,13 @@
             </ol>
         </div>
         
-        <h4>Notification API</h4>
-        <h5>Send a notification</h5>
-        <p>Test this widget by sending a notification to <strong>acme</strong> location
-            <strong>101</strong>.
-        </p>
-        <ul>
-            <li>HTTP <span class="inline-pre post">POST</span> to <span
-                    class="inline-pre">https://app.notiphy.me/api/notifications</span></li>
-            <li>Include header <span class="inline-pre">x-api-key.</span> Demo key: <span class="inline-pre">acme_UpsrDDuw_KbJUh45Gb5GyZg8NNqmBzmXw</span></li>
-        </ul>
-        <pre>
-        {
-        "tenant": "acme",
-        "locationId": "101",
-        "notification": {
-            "title": "Notification Title",
-            "text": "Body of the notification."
-            "alertLevel": "",
-            "actionUrl": "/path/to/action"
-            }
-        }
-  </pre>
-        <div class="callout">
-            <ul>
-                <li><span class="inline-pre">"locationId"</span> is optional. If not specified, the notification will be
-                    sent to all locations for the tenant.</li>
-            </ul>
-        </div>
         <p>
-            The optional properties of <span class="inline-pre">"notification"</span> can be used to customize the
-            notification.
+            There are a few ways that notifications can be customized when they are sent.
         </p>
         <ul>
             <li>
                 <span class="inline-pre">"alertLevel"</span> <br>
-                Use this property to specify the alert level of the notification. The alert level can be one of the
+                Affects the appearance of the notification, and can be one of the
                 following:
                 <ul>
                     <li class="callout">default ("" or not present)</li>
@@ -357,8 +326,8 @@
                     <li class="callout callout-warning"><strong>"warning"</strong></li>
                     <li class="callout callout-error"><strong>"error"</strong></li>
                     <li class="callout callout-blocker"><i class="material-symbols-outlined">crisis_alert</i><strong>"blocker"</strong></li>
-                    <li style="list-style-type:none;font-size:.8rem;opacity: .8;margin-left:1rem;"><span class="inline-pre">"alertLevel":"blocker"</span>forces a modal to open that prevents the User
-                from continuing until the notification is dismissed. <a class="link-btn" id="tryBlockerButton">Try it</a>.</li>
+                    <li style="list-style-type:none;font-size:.8rem;opacity: .8;margin-left:1rem;"><span class="inline-pre">"alertLevel":"blocker"</span>forces a pop-up/modal to open that prevents the User
+                from continuing until the notification is acknowledged.</li>
                 </ul>
                  
             
@@ -369,8 +338,17 @@
                 With the exception of <span class="inline-pre">cursor:pointer;</span>, the notification appearance is
                 not
                 altered.</li>
+                <li>
+                    <span class="inline-pre">"linkButton"</span> <br>
+                    If linkButton is true, the actionUrl is presented as a button in the notification. 
+                    Otherwise, the body of the notification behaves as the link.
+                </li>
                 <li><span class="inline-pre">"ttl"</span> <br>
-                    Time-to-live. Number of seconds before notification expires (default <span class="inline-pre">86400</span> (1day)).</li>
+                    Time-to-live. Number of seconds before notification expires 
+                    (default <span class="inline-pre">86400</span> (1day)). 
+                    This can be any non-zero integer, and effectively deletes the 
+                    notification after this many seconds.
+                </li>
         </ul>
     </div>
 
@@ -388,7 +366,7 @@
             reminderInterval: 120,     // Optional
             toastAlert: true,          // Optional
             toastPosition: 'top-center', // Optional
-            toastDuration: 6,          // Optional
+            toastDuration: 2.5,          // Optional
             showInboxOnLoad: false,    // Optional
             // refreshInterval: 600         // Optional
         }
@@ -396,9 +374,7 @@
             new NotiphyWidget(notiphyConfig);
 
         });
-        const alertLevels = ['primary', 'info', 'success', 'warning', 'error', 'blocker'];
-
-        
+        const alertLevels = ['primary', 'info', 'success', 'warning', 'error'];
 
         document.getElementById('tryItOutButton').addEventListener('click', () => {
             const randomAlertLevel = alertLevels[Math.floor(Math.random() * alertLevels.length)];
