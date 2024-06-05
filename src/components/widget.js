@@ -8,7 +8,7 @@
  * @class NotificationWidget
  * @param {Object} config ................. The configuration object for the notification widget.
  * @param {string} config.serviceUrl ...... The base URL for the notification service.
- * @param {string} config.tenant .......... The tenant ID for the notification service.
+ * @param {string} config.subscriberId .......... The subscriberId for the notification service.
  * @param {string} config.widgetKey ....... The widget API key for the notification service.
  * @param {string} config.locationId ...... The location ID for the notification service.
  * @param {string} config.widgetTitle ..... The title to be displayed in the notification center.
@@ -40,29 +40,31 @@ import '../styles/notiphy.css';
 
 export default class NotiphyWidget {
     constructor(config) {
-        this.config = this.loadSettings() || {
-            // default settings
-            serviceUrl: config.serviceUrl || 'https://app.notiphy.me',
-            tenant: config.tenant || null,
-            widgetKey: config.widgetKey || null,
-            locationId: config.locationId || "default",
-            widgetTitle: config.widgetTitle || "Inbox",
-            audioAlert: config.audioAlert || false,
-            audioReminder: config.audioReminder || false,
-            reminderInterval: config.reminderInterval || 180,
-            toastAlert: config.toastAlert || false,
-            toastPosition: config.toastPosition || "bottom-right",
-            toastDuration: config.toastDuration || 4,
-            width: config.width || "300px",
-            height: config.height || "400px",
-            showInboxOnLoad: config.showInboxOnLoad || false,
-            refreshInterval: config.refreshInterval || 0
+        this.defaultConfig = {
+            serviceUrl: 'https://app.notiphy.me',
+            subscriberId: null,
+            widgetKey: null,
+            locationId: "default",
+            widgetTitle: "Inbox",
+            audioAlert: false,
+            audioReminder: false,
+            reminderInterval: 180,
+            toastAlert: false,
+            toastPosition: "bottom-right",
+            toastDuration: 4,
+            width: "300px",
+            height: "400px",
+            showInboxOnLoad: false,
+            refreshInterval: 0
         };
+        
+        this.initialConfig = { ...this.defaultConfig, ...config };
+        this.config = this.loadSettings() || this.initialConfig;
         this.saveSettings();
         
         // Check for required fields
-        if (!this.config.tenant) {
-            console.error("Tenant ID is required.");
+        if (!this.config.subscriberId) {
+            console.error("subscriberId is required.");
             return;
         }
         
@@ -77,23 +79,37 @@ export default class NotiphyWidget {
         this.createDomElements();
         this.setupPeriodicRefresh(); // Refresh the notifications every so often to check for expired notifications.
         this.setupAudioReminders(); // Play a reminder sound if there are unread notifications.
+
+        // Fetch notifications on initialization
+        this.fetchNotifications();
     }
 
     /**
      * Saves user preferences (audio, toast, reminders)
      */
     saveSettings() {
-        localStorage.setItem('notiphySettings', JSON.stringify(this.config));
+        // console.log('Saving settings:', this.config); // Debugging log
+        sessionStorage.setItem('notiphySettings', JSON.stringify(this.config));
     }
-
     /**
      * Loads user preferences (audio, toast, reminders)
      */
     loadSettings() {
-        const settings = localStorage.getItem('notiphySettings');
+        const settings = sessionStorage.getItem('notiphySettings');
+        // console.log('Loaded settings:', settings); // Debugging log
         return settings ? JSON.parse(settings) : null;
     }
-
+    /**
+     * Resets the settings by clearing localStorage and reloading default configuration.
+     */
+    resetSettings() {
+        // console.log('Resetting settings to initial configuration.'); // Debugging log
+        sessionStorage.removeItem('notiphySettings');
+        this.config = { ...this.initialConfig };
+        this.saveSettings();
+        console.log('Settings have been reset to default.');
+        location.reload(); // Reload the page to apply default settings
+    }
     /**
      * Refreshes the notification center periodically to avoid expired notifications. Once expired, they're removed
      * from the database. Use this periodic check to remove expired notifications from the notification center.
@@ -127,7 +143,6 @@ export default class NotiphyWidget {
         }
     }
 
-
     /**
      * Creates the necessary DOM elements for the notification widget, including the Socket.IO script,
      * the widget's CSS, the notification icon, the toaster, and the notification center.
@@ -138,16 +153,6 @@ export default class NotiphyWidget {
         ioScript.src = "https://cdn.socket.io/4.0.0/socket.io.min.js";
         ioScript.onload = () => this.onSocketIoLoaded();
         document.head.appendChild(ioScript);
-        
-        // const stylesheet = document.createElement("link");
-        // stylesheet.setAttribute("rel", "stylesheet");
-        // stylesheet.setAttribute("href", `/dist/style.css`);
-        // document.head.appendChild(stylesheet);
-
-        // add notiphyStyles to document
-        // document.head.appendChild(document.createElement("style"));
-        // document.head.querySelector("style").innerHTML = notiphyStyles;
-
 
         // Create the widget icon. This is what the user clicks on to toggle the inbox.
         const notificationIcon = document.createElement("div");
@@ -200,6 +205,7 @@ export default class NotiphyWidget {
             + `<span class="notiphy-notification-center-connection"></span>`
             + `</div>`;
         document.body.appendChild(notificationCenter);
+        
         // Create the settings dropdown menu
         const settingsButton = document.querySelector('.notiphy-button-settings');
         const settingsDropdown = document.querySelector('.notiphy-settings-dropdown');
@@ -237,6 +243,18 @@ export default class NotiphyWidget {
 
         const closeButton = document.querySelector('.notiphy-button-close');
         closeButton.addEventListener('click', () => this.toggleNotificationCenter());
+
+        // Add reset item
+        const resetItem = document.createElement('div');
+        resetItem.className = 'notiphy-settings-dropdown-item';
+        resetItem.id = 'reset-settings-item';
+        resetItem.innerHTML = `Reset Settings <span class="material-symbols-outlined" title="Reset">restart_alt</span>`;
+        settingsDropdown.appendChild(resetItem);
+        
+        document.getElementById('reset-settings-item').addEventListener('click', () => {
+            this.resetSettings();
+            this.updateSettingsDropdown();
+        });
    
 
         // create the blocker modal.
@@ -287,24 +305,23 @@ export default class NotiphyWidget {
                 polling: {
                     extraHeaders: {
                         'x-api-key': `${this.config.widgetKey}`,
-                        'x-tenant': `${this.config.tenant}`,
+                        'x-subscriber-id': `${this.config.subscriberId}`,
                     }
                 }
             }
         };
 
-        this.socket = io(`${this.config.serviceUrl}/${this.config.tenant}`, options);
+        this.socket = io(`${this.config.serviceUrl}/${this.config.subscriberId}`, options);
 
         this.socket.on('connect', async () => {
-            // console.log('Connected to tenant:', this.config.tenant);
+             console.log('Connected to subscriberId:', this.config.subscriberId);
             this.socket.emit('joinRoom', this.config.locationId);
             
             // this.playStartSound();
             await this.fetchNotifications()
 
              // Fetch notifications on initial connection
-            
-            this.updateConnectionStatus(`Online: ${this.config.tenant} ${this.config.locationId}`);
+            this.updateConnectionStatus(`Online: ${this.config.locationId}`);
         });
 
         this.socket.on("notification", (notification) => {
@@ -730,7 +747,67 @@ export default class NotiphyWidget {
     /**
      * Fetches notifications from the server and adds them to the Notiphy notification center.
      *
-     * This method sends a GET request to the `/fetch-notifications` endpoint, passing the tenant ID 
+     * This method sends a GET request to the `/fetch-notifications` endpoint, passing the subscriberId 
+     * and location ID from the widget's configuration. The response is expected to be a JSON array 
+     * of notification objects, which are then added to the Notiphy notification center using the 
+     * `addToNotiphyCenter` method.
+     *
+     * After the notifications have been fetched and added, the `notificationsLoaded` flag is set to `true`.
+     *
+     * @returns {void}
+     */
+    // fetchNotifications() {
+    //     // console.log("Loading notifications");
+    //     const notificationsCenter = document.querySelector('.notiphy-notification-center-body');
+    //     const headers = new Headers({
+    //         'x-api-key': `${this.config.widgetKey}`,
+    //         'x-subscriber-id': `${this.config.subscriberId}`
+    //     });
+    //     fetch(`${this.config.serviceUrl}/widget/notifications?subscriberId=${this.config.subscriberId}&locationId=${this.config.locationId}`, { headers })
+    //         .then((response) => {
+    //             if (!response.ok) {
+    //                 // create an error notification object, and then add it to the notification center
+                    
+    //                     const notification = {
+    //                         id: 0,
+    //                         title: "Notiphy.me API Key Error",
+    //                         text: "The Notiphy.me API key provided is invalid. Please check your Notiphy.me dashboard for more information.",
+    //                         alertLevel: 'error',
+    //                         read: false,
+    //                         actionUrl: `https://notiphy.me/dashboard/api-keys`,
+    //                         _ts: new Date().getTime()
+    //                     };
+    //                     this.addToNotiphyCenter(notification);
+    //                     this.toggleConnection();
+    //                     if (this.config.audioReminder) {
+    //                         this.toggleAudioReminder();
+    //                     }
+    //                 throw new Error(`Request failed with status: ${response.status}`);
+    //             }
+    //             return response.json();
+    //         })
+    //         .then((notifications) => {
+    //             notificationsCenter.innerHTML = ``; // Clear previous notifications
+    //             this.updateUnreadCount(0);
+    //             this.updateTotalCount(0);
+    //             notifications.forEach((notification) => {
+    //                 this.addToNotiphyCenter(notification);
+    //             });
+    //             if (!this.notificationsLoaded && this.config.showInboxOnLoad) {
+    //                 this.toggleNotificationCenter();
+    //             }
+    //             this.notificationsLoaded = true;
+    //             const unreadCount = document.querySelector(".notiphy-notification-center-stats-unread");
+    //             if (parseInt(unreadCount.textContent) > 0) {
+    //                 this.playPopSound();
+    //             }
+    //         })
+    //         .catch((error) => console.error("Failed to fetch notifications:", error));
+    // }
+    /**
+     * Fetches notifications from the server and adds them to the Notiphy notification center.
+     *
+     * This method sends a GET request to the `/fetch-notifications` endpoint, passing the subscriberId 
      * and location ID from the widget's configuration. The response is expected to be a JSON array 
      * of notification objects, which are then added to the Notiphy notification center using the 
      * `addToNotiphyCenter` method.
@@ -740,31 +817,30 @@ export default class NotiphyWidget {
      * @returns {void}
      */
     fetchNotifications() {
-        // console.log("Loading notifications");
+        // console.log('Fetching notifications with config:', this.config); // Debugging log
         const notificationsCenter = document.querySelector('.notiphy-notification-center-body');
         const headers = new Headers({
             'x-api-key': `${this.config.widgetKey}`,
-            'x-tenant': `${this.config.tenant}`
+            'x-subscriber-id': `${this.config.subscriberId}`
         });
-        fetch(`${this.config.serviceUrl}/widget/notifications?tenantId=${this.config.tenant}&locationId=${this.config.locationId}`, { headers })
+        fetch(`${this.config.serviceUrl}/widget/notifications?subscriberId=${this.config.subscriberId}&locationId=${this.config.locationId}`, { headers })
             .then((response) => {
                 if (!response.ok) {
                     // create an error notification object, and then add it to the notification center
-                    
-                        const notification = {
-                            id: 0,
-                            title: "Notiphy.me API Key Error",
-                            text: "The Notiphy.me API key provided is invalid. Please check your Notiphy.me dashboard for more information.",
-                            alertLevel: 'error',
-                            read: false,
-                            actionUrl: `https://notiphy.me/dashboard/api-keys`,
-                            _ts: new Date().getTime()
-                        };
-                        this.addToNotiphyCenter(notification);
-                        this.toggleConnection();
-                        if (this.config.audioReminder) {
-                            this.toggleAudioReminder();
-                        }
+                    const notification = {
+                        id: 0,
+                        title: "Notiphy.me API Key Error",
+                        text: "The Notiphy.me API key provided is invalid. Please check your Notiphy.me dashboard for more information.",
+                        alertLevel: 'error',
+                        read: false,
+                        actionUrl: `https://notiphy.me/dashboard/api-keys`,
+                        _ts: new Date().getTime()
+                    };
+                    this.addToNotiphyCenter(notification);
+                    this.toggleConnection();
+                    if (this.config.audioReminder) {
+                        this.toggleAudioReminder();
+                    }
                     throw new Error(`Request failed with status: ${response.status}`);
                 }
                 return response.json();
@@ -829,9 +905,9 @@ export default class NotiphyWidget {
             headers: {
                 "Content-Type": "application/json",
                 'x-api-key': `${this.config.widgetKey}`,
-                'x-tenant': `${this.config.tenant}`,
+                'x-subscriber-id': `${this.config.subscriberId}`,
             },
-            body: JSON.stringify({ notificationId, tenantId: this.config.tenant }),
+            body: JSON.stringify({ notificationId, subscriberId: this.config.subscriberId }),
         })
             .then((response) => response.json())
             .then((data) => {
@@ -863,7 +939,7 @@ export default class NotiphyWidget {
             setTimeout(() => {
                 this.markRead(button.dataset.notificationId, button);
                 this.playClickOffSound();
-            }, index * 150); // short delay between each iteration
+            }, index * 110); // short delay between each iteration
         });
     }
 
@@ -880,11 +956,11 @@ export default class NotiphyWidget {
             headers: {
                 "Content-Type": "application/json",
                 'x-api-key': `${this.config.widgetKey}`,
-                'x-tenant': `${this.config.tenant}`,
+                'x-subscriber-id': `${this.config.subscriberId}`,
             },
             body: JSON.stringify({
                 notificationId,
-                tenantId: this.config.tenant,
+                subscriberId: this.config.subscriberId,
                 locationCode: this.config.locationId,
             }),
         })

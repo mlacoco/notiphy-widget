@@ -182,10 +182,12 @@
         }
 
         .tryitout {
-            text-align: center;
+            display:flex;
+            justify-content: center;flex-wrap:wrap;
         }
 
         .tryit-btn {
+            position:relative;
             box-sizing: content-box;
             background-color: rgba(8, 5, 58, 1);
             color: #FFF !important;
@@ -202,8 +204,13 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all .2s ease-in-out;
-            margin: 2rem;
+            transition: all .15s ease-in-out;
+            margin: .5rem;
+            width:160px;
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            text-wrap: nowrap;
         }
 
         .tryit-btn:hover {
@@ -211,6 +218,15 @@
             color: #FFF;
             border: 3px solid #FFF;
             text-shadow: 0 0 9px #ff00d9;
+        }
+        .tryit-btn:active {
+            background-color: rgba(8, 5, 58, 1);
+            transform: scale(.98);
+        }
+        .tryit-btn i {
+            position:absolute;
+            opacity: .6;
+            left:.6rem;
         }
         .link-btn {
             cursor:pointer;
@@ -225,7 +241,6 @@
 <body>
     <div class="logo">
         <span>Notiphy.me<i class="material-symbols-outlined">notifications</i></span>
-
     </div>
     <div class="container">
         <h1>The Notiphy widget</h1>
@@ -252,8 +267,8 @@
         
         <div class="tryitout">
             <!-- Try it out button -->
-            <button id="tryItOutButton" class="tryit-btn">Send a notification</button>
-            <a class="tryit-btn" id="tryBlockerButton">Try a blocker</a>
+            <button id="tryItOutButton" class="tryit-btn">Try it now <i class="material-symbols-outlined">notifications</i></button>
+            <button id="tryBlockerButton" class="tryit-btn">Try a blocker <i class="material-symbols-outlined">crisis_alert</i></button>
         </div>
         <h4>Embed the widget</h4>
         <p>Include the widget and it's CSS in your document's <span class="inline-pre">&lt;head></span> section.</p>
@@ -329,8 +344,6 @@
                     <li style="list-style-type:none;font-size:.8rem;opacity: .8;margin-left:1rem;"><span class="inline-pre">"alertLevel":"blocker"</span>forces a pop-up/modal to open that prevents the User
                 from continuing until the notification is acknowledged.</li>
                 </ul>
-                 
-            
             </li>
 
             <li><span class="inline-pre">"actionUrl"</span> <br>
@@ -353,101 +366,81 @@
     </div>
 
     <script>
-        const notiphyApiEndpoint = 'https://app.notiphy.me';
-        const notiphyApiKey = 'acme_UpsrDDuw_KbJUh45Gb5GyZg8NNqmBzmXw'; //NOT widget key. Used for sending notifications.
         const notiphyConfig = {
-            tenant: 'acme',
-            widgetKey: 'acme_ahZGqLQf_3Pn7ynt4k3fHLJefUeD4c6Pd', // Demo Widget api key provided.
-            locationId: '101',         // Optional
+            subscriberId: 'notiphy',
+            widgetKey: 'notiphy_LzPaJ43t_C8vn4iX1X3EvecxFxHcvdAYE',
+            locationId: 'notiphy_demo',        // Optional
             widgetTitle: 'Notification Feed',  // Optional
-            height: '65vh',            // Optional
-            audioAlert: true,          // Optional
-            audioReminder: true,       // Optional
-            reminderInterval: 120,     // Optional
-            toastAlert: true,          // Optional
-            toastPosition: 'top-center', // Optional
-            toastDuration: 2.5,          // Optional
-            showInboxOnLoad: false,    // Optional
-            // refreshInterval: 600         // Optional
+            height: '65vh',                    // Optional
+            audioAlert: true,                  // Optional
+            audioReminder: true,               // Optional
+            reminderInterval: 30,              // Optional
+            toastAlert: true,                  // Optional
+            toastPosition: 'top-center',       // Optional
+            toastDuration: 3,                  // Optional
+            showInboxOnLoad: false,            // Optional
+            // refreshInterval: 600            // Optional
         }
         document.addEventListener('DOMContentLoaded', function () {
             new NotiphyWidget(notiphyConfig);
-
         });
         const alertLevels = ['primary', 'info', 'success', 'warning', 'error'];
 
         document.getElementById('tryItOutButton').addEventListener('click', () => {
             const randomAlertLevel = alertLevels[Math.floor(Math.random() * alertLevels.length)];
             const notificationData = {
-                tenant: "acme",
-                locationId: "101",
+                subscriberId: "notiphy",
+                locationId: "notiphy_demo",
                 notification: {
                     title: `${randomAlertLevel[0].toUpperCase()}${randomAlertLevel.slice(1)} Notification`,
                     text: `This notification is sent with an alertLevel of '${randomAlertLevel}'.`,
                     alertLevel: randomAlertLevel,
                     actionUrl: "/path/to/action",
-                    ttl: 30
+                    ttl: 300
                 }
             };
-            
-            fetch(`${notiphyApiEndpoint}/api/notifications`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': notiphyApiKey
-                },
-                body: JSON.stringify(notificationData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Notification sent successfully:', data);
-                })
-                .catch((error) => {
-                    console.error('Error sending notification:', error);
-                });
+            sendNotification(notificationData);
         });
 
         document.getElementById('tryBlockerButton').addEventListener('click', () => {
             const notificationData = {
-                tenant: "acme",
-                locationId: "101",
+                subscriberId: "notiphy",
+                locationId: "notiphy_demo",
                 notification: {
                     title: "Blocker Notification!",
                     text: "This notification was sent with alertLevel: blocker. The User will be unable to continue until this notification is dismissed.",
                     alertLevel: "blocker",
                     actionUrl: "",
-                    ttl: 30
+                    ttl: 300
                 }
             };
+            sendNotification(notificationData);
             
-            fetch(`${notiphyApiEndpoint}/api/notifications`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': notiphyApiKey
-                },
-                body: JSON.stringify(notificationData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Notification sent successfully:', data);
-                })
-                .catch((error) => {
-                    console.error('Error sending notification:', error);
-                });
         });
     
-        
+        const sendNotification = async (notificationData) => {
+            const notiphyApiKey = 'notiphy_jFWcFdia_Dj2KnBeftggxa95PuGhph5yw';
+            await fetch(`https://app.notiphy.me/api/notifications`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': notiphyApiKey
+                    },
+                    body: JSON.stringify(notificationData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Notification sent successfully:', data);
+                    })
+                    .catch((error) => {
+                    console.error('Error sending notification:', error);
+                });
+        }
     </script>
 
 </body>
