@@ -11,15 +11,15 @@ The easiest way to add the Notiphy widget is to use the CDN links below to inclu
 
 ### CDN (JSDelivr)
  
-- `https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/notiphy-widget.umd.js`
+- `https://cdn.notiphy.me/notiphy-widget.v1.1.umd.js`
 
 
-- `https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/style.css`
+- `https://cdn.notiphy.me/notiphy.min.css`
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/notiphy-widget.umd.js"></script>
+<script src="https://cdn.notiphy.me/notiphy-widget.v1.1.umd.js"></script>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mlacoco/notiphy-widget@latest/dist/style.css">
+<link rel="stylesheet" href="https://cdn.notiphy.me/notiphy.min.css">
 ```
 
 ### Or build it yourself
