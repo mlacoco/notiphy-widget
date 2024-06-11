@@ -70,8 +70,8 @@ To initialize the Notiphy Widget, include the generated JavaScript and css files
     <script src="dist/notiphy-widget.umd.js"></script>
     <script>
         const widget = new NotiphyWidget({
-            tenant: 'your-tenant-id',
-            apiKey: 'your-api-key',
+            subscriberId: 'your-subscriber-id',
+            widgetKey: 'your-api-key',
             locationId: 'default',          // Optional
             widgetTitle: 'Inbox',           // Optional
             audioAlert: false,              // Optional
@@ -81,7 +81,9 @@ To initialize the Notiphy Widget, include the generated JavaScript and css files
             toastPosition: 'bottom-right',  // Optional
             toastDuration: 4,               // Optional
             showInboxOnLoad: false,         // Optional
-            refreshInterval: 0              // Optional
+            refreshInterval: 0,             // Optional
+            compact: false,                 // Optional
+            targetElement: '.notiphy-container' // Required if compact
         });
     </script>
 </body>
@@ -91,8 +93,8 @@ To initialize the Notiphy Widget, include the generated JavaScript and css files
 ### Configuration Options
 The Notiphy Widget can be configured with the following options:
 
-- **tenant**: The tenant ID for the notification service. (Required)
-- **apiKey**: The API key for the notification service. (Required)
+- **subscriberId**: The subscriber ID for the notification service. (Required)
+- **widgetKey**: The Widget API key for the notification service. (Required)
 - **locationId**: The location ID for the notification service. Default is 'default'.
 - **widgetTitle**: The title to be displayed in the Inbox. Default is 'Inbox'.
 - **audioAlert**: Whether to play a sound when a new notification is received. Default is `false`.
@@ -103,13 +105,15 @@ The Notiphy Widget can be configured with the following options:
 - **toastDuration**: Duration in seconds for how long the toast notification is displayed. Default is `4` seconds.
 - **showInboxOnLoad**: Whether to show the Inbox by default when the widget loads. Default is `false`.
 - **refreshInterval**: For use in SPA's. Interval in seconds to refresh the Inbox. Default is `0`. If specified, minimum value is `300` (5 minutes) (no auto-refresh). Clears expired notifications from the inbox, nothing else.
+- **compact**: Compact mode. Relatively positioned in a container. Default is `false`.
+- **targetElement**: Required for compact mode. The target element to render the widget in.
 
 ### Features
 
 #### Real-Time Notifications
 The Notiphy Widget supports real-time notifications via WebSockets. Notifications are delivered instantly to the widget without the need for manual refreshes.
 
-#### Toast Notifications
+#### Toast Alerts
 Toast notifications are brief messages that appear on the screen and fade out after a specified duration. You can customize the position and duration of toast notifications through the widget configuration.
 
 #### Inbox
@@ -151,13 +155,12 @@ To use the Notiphy Widget, include the necessary CSS and JS files in your HTML, 
     <link rel="stylesheet" href="/dist/style.css">
 </head>
 <body>
-    <div id="notiphy-widget"></div>
     <script src="/dist/notiphy-widget.umd.js"></script>
     <script>
         // Initialize with default configuration.
         const widget = new NotiphyWidget({
-            tenant: 'your-tenant-id',
-            apiKey: 'your-api-key',
+            subscriberId: 'your-tenant-id',
+            widgetKey: 'your-api-key',
         });
     </script>
 </body>
@@ -170,13 +173,28 @@ To customize the widget, modify the configuration options passed during initiali
 ```javascript
 // Initialize with additional configuration options
 const widget = new NotiphyWidget({
-    tenant: 'your-tenant-id',
-    apiKey: 'your-api-key',
-    audioAlert: true, // load widget with audio enabled.
-    toastAlert: true, // load widget with toasts enabled.
+    subscriberId: 'your-tenant-id',
+    widgetKey: 'your-api-key',
+    audioAlert: true,          // load widget with audio enabled.
+    toastAlert: true,          // load widget with toasts enabled.
     toastPosition: 'top-right' // set toast position to top-right.
 });
 ```
+Compact mode example.  Renders the widget in a relatively positioned target element.
+```javascript
+// Initialize with additional configuration options
+const widget = new NotiphyWidget({
+    subscriberId: 'your-tenant-id',
+    locationId: 'user@domain.com',      // initialize for a particular user.
+    widgetKey: 'your-api-key',
+    audioAlert: true,                   // load widget with audio enabled.
+    toastAlert: true,                   // load widget with toasts enabled.
+    toastPosition: 'top-center',        // set toast position to top-center.
+    compact: true,                      // load widget in compact mode.
+    targetElement: '.notiphy-container' // target element to render widget in.
+});
+```
+
 ### Conclusion
 
 The Notiphy Widget is a powerful and flexible notification solution for your web applications. By following the setup and usage instructions provided in this documentation, you can quickly integrate and customize the widget to meet your notification needs.
