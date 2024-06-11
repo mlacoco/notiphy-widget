@@ -1,17 +1,18 @@
 {
   "name": "notiphy-widget",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Embeddable javascript notification/inbox widget from Notiphy.me",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
-},
+  },
   "keywords": [],
-  "author": "",
+  "author": "M. LaCoco",
   "license": "ISC",
   "dependencies": {
+    "rollup-plugin-postcss": "^4.0.2",
     "vite": "^5.2.11"
   }
 }

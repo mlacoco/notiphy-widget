@@ -1,0 +1,68 @@
+/* src/styles/notiphy.compact.css */
+/* The widget icon in compact mode */
+.notiphy-icon.notiphy-compact {
+     width: 30px; 
+    height: 30px;
+    bottom: unset;
+    right: unset;
+    border-width:2px;
+    position: relative;
+}
+.notiphy-compact>.material-symbols-outlined {
+    font-size: .8em;
+}
+
+#notiphy-notification-center.notiphy-compact  {
+    bottom:unset;
+    top:1rem;
+    right: 1rem;
+    height: 300px!important;
+    position: absolute; 
+    transform-origin: top right; /* Transform origin from the bottom right */
+}
+
+#notiphy-notification-center.notiphy-compact .notification-center-title {
+    font-size:16px;
+    font-weight:normal;
+}
+
+.notiphy-compact .notiphy-notification-count {
+    font-size: .5rem;
+    height: 16px;
+    border-width: 1px;
+    line-height: .5;
+    min-width: 16px;
+    border-radius: 8px;
+}
+@media (max-width: 576px) {
+    #notiphy-notification-center.notiphy-compact {
+        position:fixed;
+        top: 0;
+        left: 0;
+        width: 100%!important;
+        height: 100%;
+        max-height: 100%;
+        min-height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        background: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%);
+        backdrop-filter: blur(10px);
+        z-index: 5001;
+    }
+    .notiphy-compact .notiphy-notification-center-header,
+    .notiphy-compact .notiphy-notification-center-footer {
+        border-radius: 0;
+    }
+    .notiphy-compact .notiphy-notification-center-stats-unread {
+        position: relative;
+        top: unset;
+        left: unset;
+        margin-right:.25rem;
+    }
+    .notiphy-compact .notiphy-icon {
+        z-index: 5000;
+    }
+    .notiphy-compact .notiphy-modal-content {
+        width: 90%;
+    }
+}

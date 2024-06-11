@@ -105,6 +105,7 @@ from interfering with our styles */
     /* box-shadow: 0 0 3px rgba(0, 0, 0, 0.6); */
     line-height: normal;
     font-size: .7rem;
+    font-weight:normal;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -490,10 +491,10 @@ from interfering with our styles */
     backdrop-filter: blur(10px);
     z-index: 5001;
 }
-/* .notiphy-notification-center-header .notiphy-notification-center-title { */
-    /* font-family: "Pacifico", cursive; */
-    /* color: rgb(255, 255, 255); */
-/* } */
+.notiphy-notification-center-header .notiphy-notification-center-title { 
+    font-size: 1rem !important;
+    font-family: var(--notiphy-primary-font-family);
+}
 
 /* top settings buttons */
 .notiphy-button-audio-alert,
@@ -597,6 +598,8 @@ from interfering with our styles */
 .notiphy-settings-dropdown-item {
     display: flex;
     justify-content: space-between;
+    font-size:1rem;
+    font-weight:normal;
     align-items: center;
     padding: 10px 15px;
     cursor: pointer;
@@ -945,15 +948,18 @@ from interfering with our styles */
 /* notification body (inbox) */
 .notiphy-notification-body {
     font-size: .75rem;
+    font-weight: normal;
 }
 
 /* notification footer (inbox) */
 .notiphy-notification-footer {
     font-size: .67rem;
+    font-weight:normal;
     text-align: right;
     color: rgba(0, 0, 0, 0.5);
 }
 
+/* small screens */
 @media (max-width: 576px) {
     #notiphy-notification-center {
         top: 0;

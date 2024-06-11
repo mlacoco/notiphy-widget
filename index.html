@@ -232,9 +232,13 @@
             cursor:pointer;
             text-decoration: underline;
         }
+        .notiphy-container {
+            position:relative;
+            float:right;
+        }
     </style>
-    <script src="dist/notiphy-widget.umd.js"></script>
-    <link rel="stylesheet" href="/dist/style.css">
+    <script src="dist/notiphy-widget.v1.1.umd.js"></script>
+    <link rel="stylesheet" href="/dist/notiphy.min.css">
     <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>@media (prefers-color-scheme: light){ :root{ filter: none;}}@media (prefers-color-scheme: dark){ :root{ filter: invert(100%);}}</style><path d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6'/></svg>">
 </head>
 
@@ -242,8 +246,9 @@
     <div class="logo">
         <span>Notiphy.me<i class="material-symbols-outlined">notifications</i></span>
     </div>
+    
     <div class="container">
-        <h1>The Notiphy widget</h1>
+        <h1>The Notiphy widget <span class="notiphy-container" ></span></h1>
         <p>A really easy way to add toasts, alerts, and an inbox to store them all in to your app or website.</p>
 
         <div class="callout">
@@ -270,20 +275,18 @@
             <button id="tryItOutButton" class="tryit-btn">Try it now <i class="material-symbols-outlined">notifications</i></button>
             <button id="tryBlockerButton" class="tryit-btn">Try a blocker <i class="material-symbols-outlined">crisis_alert</i></button>
         </div>
+        
         <h4>Embed the widget</h4>
-        <p>Include the widget and it's CSS in your document's <span class="inline-pre">&lt;head></span> section.</p>
+        <p>Include the widget and CSS from our CDN in your document's <span class="inline-pre">&lt;head></span> section.</p>
         <pre>
 
         &lt;head>
             ...
-            &lt;script src="path/to/notiphy-widget.umd.js">&lt;/script>
+            &lt;script src="https://cdn.notiphy.me/notiphy-widget.v1.1.umd.js">&lt;/script>
+            &lt;link rel="stylesheet" href="https://cdn.notiphy.me/notiphy.min.css">
             ...
         &lt;/head>
         </pre>
-        <h5>Or CDN</h5>
-        <ul>
-            <li>JS: <span class="inline-pre">https://cdn.notiphy.me/notiphy-widget@latest/notiphy-widget.umd.js</span></li>
-        </ul>
         
         <p>Initialize the widget before your closing <span class="inline-pre">&lt;/body></span> tag. The example below shows the minimal config, loading default settings.</p>
         <pre>
@@ -307,9 +310,9 @@
         <div class="callout">
             <h4>Config parameters</h4>
             <ol class="mono">
-                <li>notiphyId ....... [Required] The subscriber ID for the notification service.</li>
+                <li>subscriberId .... [Required] The subscriber ID for the notification service.</li>
                 <li>widgetKey ....... [Required] The widget API key for the notification service.</li>
-                <li>userId .......... The user/location ID for the Widget (default: 'default').</li>
+                <li>locationId ...... The user/location ID for the Widget (default: 'default').</li>
                 <li>widgetTitle ..... Custom title to be displayed in the Inbox.</li>
                 <li>audioAlert ...... true/false. Sound on/off (off by default)</li>
                 <li>audioReminder ... true/false. Audible reminder of unread notifications on/off (off by
@@ -322,6 +325,8 @@
                 <li>height .......... The height of the Inbox (default: "400px", 'vh' also supported).</li>
                 <li>showInboxOnLoad.. Whether to show the Inbox by default (default: false).</li>
                 <li>refreshInterval.. Seconds until auto-refresh Inbox if provided. (off by default, min. 300).</li>
+                <li>compact.......... compact mode, relatively positioned (default: false).</li>
+                <li>targetElement.... Required if compact: true. Relatively positioned element to place the widget.</li>
             </ol>
         </div>
         
@@ -356,12 +361,7 @@
                     If linkButton is true, the actionUrl is presented as a button in the notification. 
                     Otherwise, the body of the notification behaves as the link.
                 </li>
-                <li><span class="inline-pre">"ttl"</span> <br>
-                    Time-to-live. Number of seconds before notification expires 
-                    (default <span class="inline-pre">86400</span> (1day)). 
-                    This can be any non-zero integer, and effectively deletes the 
-                    notification after this many seconds.
-                </li>
+                
         </ul>
     </div>
 
@@ -369,28 +369,32 @@
         const notiphyConfig = {
             subscriberId: 'notiphy',
             widgetKey: 'notiphy_LzPaJ43t_C8vn4iX1X3EvecxFxHcvdAYE',
-            locationId: 'notiphy_demo',        // Optional
-            widgetTitle: 'Notification Feed',  // Optional
-            height: '65vh',                    // Optional
+            locationId: 'notiphy_demo',           // Optional
+            branded: false,
+            // widgetTitle: 'Notification Feed',  // Optional
+            // height: '65vh',                    // Optional
             audioAlert: true,                  // Optional
-            audioReminder: true,               // Optional
+            // audioReminder: true,               // Optional
             reminderInterval: 30,              // Optional
             toastAlert: true,                  // Optional
-            toastPosition: 'top-center',       // Optional
-            toastDuration: 3,                  // Optional
-            showInboxOnLoad: false,            // Optional
-            // refreshInterval: 600            // Optional
+            // toastPosition: 'top-center',       // Optional
+            // toastDuration: 3,                  // Optional
+            // showInboxOnLoad: false,            // Optional
+            // refreshInterval: 600               // Optional
+            // compact: true,                     // Optional
+            // targetElement: '.notiphy-container' // Optional
         }
+
         document.addEventListener('DOMContentLoaded', function () {
             new NotiphyWidget(notiphyConfig);
         });
-        const alertLevels = ['primary', 'info', 'success', 'warning', 'error'];
 
         document.getElementById('tryItOutButton').addEventListener('click', () => {
+            const alertLevels = ['primary', 'info', 'success', 'warning', 'error'];
             const randomAlertLevel = alertLevels[Math.floor(Math.random() * alertLevels.length)];
             const notificationData = {
-                subscriberId: "notiphy",
-                locationId: "notiphy_demo",
+                subscriberId: "notiphy",  // loginToken
+                locationId: "notiphy_demo", // locationCode
                 notification: {
                     title: `${randomAlertLevel[0].toUpperCase()}${randomAlertLevel.slice(1)} Notification`,
                     text: `This notification is sent with an alertLevel of '${randomAlertLevel}'.`,

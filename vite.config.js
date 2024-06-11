@@ -7,12 +7,18 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/components/widget.js'),
       name: 'NotiphyWidget',
-      fileName: (format) => `notiphy-widget.${format}.js`,
+      fileName: (format) => `notiphy-widget.v1.1.${format}.js`,
       formats: ['umd']
     },
     rollupOptions: {
       output: {
-        globals: {}
+        globals: {},
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'style.css') {
+            return 'notiphy.min.css';
+          }
+          return assetInfo.name;
+        }
       }
     }
   },
