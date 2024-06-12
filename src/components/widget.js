@@ -37,7 +37,7 @@ import pop from '../assets/audio/pop.mp3';
 import start from '../assets/audio/start.mp3';
 import whoosh from '../assets/audio/whoosh.mp3';
 
-
+// import css for Vite to process.
 import '../styles/notiphy.base.css';
 import '../styles/notiphy.compact.css';
 export default class NotiphyWidget {
@@ -309,7 +309,7 @@ export default class NotiphyWidget {
         document.body.appendChild(blockerModal);
     }
 
-    
+    // gets the appropriate icon for toast position
     getToastPositionIcon() {
         const positionIcons = {
             'bottom-right': 'south_east',
@@ -322,6 +322,7 @@ export default class NotiphyWidget {
         return positionIcons[this.config.toastPosition] || 'south_east';
     }
 
+    // updates toast position icon
     updateSettingsDropdown() {
         document.querySelector('.notiphy-button-audio-alert').innerHTML = this.config.audioAlert ? 'volume_up' : 'volume_off';
         document.querySelector('.notiphy-button-audio-reminder').innerHTML = this.config.audioReminder ? 'alarm_on' : 'alarm_off';
@@ -741,7 +742,6 @@ export default class NotiphyWidget {
 
     /**
      * Adds a new notification to the notification center.
-     *
      * @param {Object} notification - The notification object to be added.
      * @returns {void}
      */
