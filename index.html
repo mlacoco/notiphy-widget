@@ -351,16 +351,20 @@
                 </ul>
             </li>
 
-            <li><span class="inline-pre">"actionUrl"</span> <br>
+            <li><span class="inline-pre">"actionUrl"</span> 
                 If this property is specified, the body of the notification is a clickable link for the recipient.
-                With the exception of <span class="inline-pre">cursor:pointer;</span>, the notification appearance is
-                not
-                altered.</li>
-                <!-- next commit <li>
-                    <span class="inline-pre">"linkButton"</span> <br>
+                With the exception of mouse cursor appearance on mouseover, the notification appearance is
+                not altered.
+            </li>
+                <li>
+                    <span class="inline-pre">"linkButton"</span> 
                     If linkButton is true, the actionUrl is presented as a button in the notification. 
                     Otherwise, the body of the notification behaves as the link.
-                </li> -->
+                </li>
+                <li>
+                    <span class="inline-pre">"linkButtonLabel"</span> 
+                    Specifies a label for the button.  If not specified, the label is "Click here"
+                </li>
                 
         </ul>
     </div>
@@ -373,14 +377,14 @@
             widgetTitle: 'Notification Feed',  // Optional
             height: '65vh',                    // Optional
             audioAlert: true,                  // Optional
-            audioReminder: true,               // Optional
+            audioReminder: false,               // Optional
             reminderInterval: 30,              // Optional
             toastAlert: true,                  // Optional
             toastPosition: 'top-center',       // Optional
             toastDuration: 3,                  // Optional
             showInboxOnLoad: false,            // Optional
             refreshInterval: null,             // Optional
-            compact: true,                     // Optional
+            compact: false,                     // Optional
             targetElement: '.notiphy-container'// Optional
         }
 

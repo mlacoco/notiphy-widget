@@ -670,6 +670,10 @@ export default class NotiphyWidget {
     assembleToast(notification) {
         const toastElement = document.createElement("div");
         toastElement.className = `notiphy-notification-element notiphy-toast notiphy-${notification.alertLevel} ${notification.read ? "notiphy-read" : ""}`;
+        
+        const isButton = notification.actionUrl && notification.linkButton? true : false;
+        const linkButton = !isButton? `` : `<div class="notiphy-linkButton-container"><a href="${notification.actionUrl}" class="notiphy-button-link">${!notification.linkButtonLabel ? `Click here` : `${notification.linkButtonLabel}`}</a></div>`;
+        
         toastElement.innerHTML = ``
         + `<div class='notiphy-notification-left'>`
         +   `<i class="material-symbols-outlined">notifications_unread</i>`
@@ -679,7 +683,9 @@ export default class NotiphyWidget {
         +       `<i class="notiphy-button-dismiss material-symbols-outlined" title="Dismiss" data-notification-id="${notification.id}">close</i>`
         +   `</div>`
         +   `<div class='notiphy-notification-header'>${notification.title}</div>`
-        +   `<div class='notiphy-notification-body'${notification.actionUrl ? ` onclick="location.href='${notification.actionUrl}';"` : ""}>${notification.text}</div>`
+        // +   `<div class='notiphy-notification-body'${notification.actionUrl ? ` onclick="location.href='${notification.actionUrl}';"` : ""}>${notification.text}</div>`
+        + `<div class='notiphy-notification-body'${notification.actionUrl && !isButton ? ` style="cursor:pointer;" onclick="location.href='${notification.actionUrl}';"` : ""}>${notification.text}</div>`
+        + `${linkButton}`
         +   `<div class='notiphy-notification-footer'>Right now</div>`
         + `</div>`
         + `<div class="progress active"></div>`
@@ -689,14 +695,14 @@ export default class NotiphyWidget {
     /**
      * Assembles a notification element based on the provided notification object.
      * Differs from the Toast element slightly (no progress bar, action buttons, etc.)
-     * @param {Object} notification - The notification object.
-     * @param {boolean} [isToast=false] - Indicates whether the notification is a toast notification.
-     * @returns {HTMLElement} The assembled notification element.
      */
     assembleNotification(notification) {
         
         const notificationElement = document.createElement("div");
         notificationElement.className = `notiphy-notification-element${notification.read ? " notiphy-read" : ""}${!notification.alertLevel ? `` : ` notiphy-${notification.alertLevel}`}`;
+        
+        const isButton = notification.actionUrl && notification.linkButton? true : false;
+        const linkButton = !isButton? `` : `<div class="notiphy-linkButton-container"><a href="${notification.actionUrl}" class="notiphy-button-link">${!notification.linkButtonLabel ? `Click here` : `${notification.linkButtonLabel}`}</a></div>`;
         
         notificationElement.innerHTML = ``
         + `<div class='notiphy-notification-left'>`
@@ -708,7 +714,8 @@ export default class NotiphyWidget {
         + `<i class="notiphy-button-dismiss material-symbols-outlined" title="Dismiss" data-notification-id="${notification.id}">delete_forever</i>`
         + `</div>`
         + `<div class='notiphy-notification-header'>${notification.title}</div>`
-        + `<div class='notiphy-notification-body'${notification.actionUrl ? ` onclick="location.href='${notification.actionUrl}';"` : ""}>${notification.text}</div>`
+        + `<div class='notiphy-notification-body'${notification.actionUrl && !isButton ? ` style="cursor:pointer;" onclick="location.href='${notification.actionUrl}';" title="Go to ${notification.actionUrl}"` : ""} >${notification.text}</div>`
+        + `${linkButton}`
         + `<div class='notiphy-notification-footer'></div>`
         + `</div>`;
 

@@ -748,7 +748,7 @@ from interfering with our styles */
 /* Dismiss ALL button */
 .notiphy-button-dismiss-all {
     margin-right:auto;
-    font-size:1.35rem!important;
+    font-size:1.35rem;
 }
 
 /* logo in footer */
@@ -756,6 +756,7 @@ from interfering with our styles */
     display:block;
     position:fixed;
     font-size:.8rem;
+    font-weight:normal;
 }
 
 /* status indicator light */
@@ -851,9 +852,31 @@ from interfering with our styles */
 /* hover notification in inbox */
 .notiphy-notification-element:hover {
     background-color: #f5f5f5!important;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
-
+.notiphy-notification-element .notiphy-linkButton-container {
+    padding-top:4px;
+}
+.notiphy-notification-element .notiphy-button-link {
+    border: 1px solid rgba(var(--notiphy-plain-color), 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin: .5rem 1rem;
+    /* background: linear-gradient(150deg, rgba(255, 255, 255, 1) 2%, rgba(0, 0, 0, .1) 100%); */
+    padding: 0 12px;
+    text-decoration: none;
+    color: #000000b3;
+    box-shadow: 0 2px 3px #0000004d;
+    font-size: .75rem;
+    height: 24px;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+}
+.notiphy-notification-element .notiphy-button-link:hover {
+    background-color:#FFF;
+}
 /* left column, notification icon/avatar */
 .notiphy-notification-left {
     float: left;
@@ -874,7 +897,7 @@ from interfering with our styles */
 .notiphy-notification-left:first-child {
     /* border-radius:50% 0 0 50%; */
     /* padding:.2rem; */
-    margin: auto .5rem;
+    margin: 1rem .5rem;
 }
 
 /* set font size for notification icon/avatar */
@@ -975,11 +998,27 @@ from interfering with our styles */
         backdrop-filter: blur(10px);
         z-index: 5001;
     }
-
+    .notiphy-notification-center-body {
+        
+        padding-top: calc(3rem - 11px);
+        padding-bottom: 3rem;
+    }
     .notiphy-notification-center-header,
     .notiphy-notification-center-footer {
         border-radius: 0;
+        height:3rem;
     }
+    .notiphy-notification-center-header i,
+    .notiphy-notification-center-footer i {
+        font-size:2rem;
+        
+    }
+    .notiphy-notification-center-footer .notiphy-button-mark-all-read {
+        margin-left:1rem;
+    }
+    /* .notiphy-button-close, .notiphy-button-settings {
+        scale: 1.5;
+    } */
     .notiphy-notification-center-stats-unread {
         position: relative;
         top: unset;
