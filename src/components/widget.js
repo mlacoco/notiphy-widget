@@ -816,10 +816,10 @@ export default class NotiphyWidget {
                     this.toggleNotificationCenter();
                 }
                 this.notificationsLoaded = true;
-                const unreadCount = document.querySelector(".notiphy-notification-center-stats-unread");
-                if (parseInt(unreadCount.textContent) > 0) {
-                    this.playPopSound();
-                }
+                // const unreadCount = document.querySelector(".notiphy-notification-center-stats-unread");
+                // if (parseInt(unreadCount.textContent) > 0) {
+                //     this.playPopSound();
+                // }
             })
             .catch((error) => console.error("Failed to fetch notifications:", error));
     }

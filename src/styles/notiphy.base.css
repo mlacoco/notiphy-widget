@@ -116,6 +116,7 @@ from interfering with our styles */
     
     
 }
+
 /* reposition to the right of the icon when inbox is closed*/
 .notiphy-notification-count {
     left:unset;
@@ -901,9 +902,9 @@ from interfering with our styles */
 }
 
 /* set font size for notification action buttons */
-.notiphy-notification-actions .material-symbols-outlined {
+/* .notiphy-notification-actions .material-symbols-outlined { */
     /* font-size: 1.1rem !important; */
-}
+/* } */
 /* read notifications appear faded */
 .notiphy-notification-element.notiphy-read {
     background-color: #f5f5f5!important;
