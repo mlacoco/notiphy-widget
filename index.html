@@ -356,11 +356,11 @@
                 With the exception of <span class="inline-pre">cursor:pointer;</span>, the notification appearance is
                 not
                 altered.</li>
-                <li>
+                <!-- next commit <li>
                     <span class="inline-pre">"linkButton"</span> <br>
                     If linkButton is true, the actionUrl is presented as a button in the notification. 
                     Otherwise, the body of the notification behaves as the link.
-                </li>
+                </li> -->
                 
         </ul>
     </div>
@@ -369,8 +369,7 @@
         const notiphyConfig = {
             subscriberId: 'notiphy',
             widgetKey: 'notiphy_LzPaJ43t_C8vn4iX1X3EvecxFxHcvdAYE',
-            locationId: 'notiphy_demo',           // Optional
-            branded: false,
+            locationId: 'notiphy_demo',        // Optional
             widgetTitle: 'Notification Feed',  // Optional
             height: '65vh',                    // Optional
             audioAlert: true,                  // Optional
@@ -380,9 +379,9 @@
             toastPosition: 'top-center',       // Optional
             toastDuration: 3,                  // Optional
             showInboxOnLoad: false,            // Optional
-            refreshInterval: null,               // Optional
+            refreshInterval: null,             // Optional
             compact: true,                     // Optional
-            targetElement: '.notiphy-container' // Optional
+            targetElement: '.notiphy-container'// Optional
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -423,6 +422,7 @@
         });
     
         const sendNotification = async (notificationData) => {
+            // demo key localhost only
             const notiphyApiKey = 'notiphy_jFWcFdia_Dj2KnBeftggxa95PuGhph5yw';
             await fetch(`https://app.notiphy.me/api/notifications`, {
                     method: 'POST',

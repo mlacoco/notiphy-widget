@@ -1,31 +1,36 @@
 # Notiphy.me Widget 
 
 ## Overview
-The Notiphy Widget is an embeddable Javascript component that is designed to integrate Notiphy.me notifications into your web applications. It provides real-time notifications and flexible configuration options.
+The Notiphy Widget is an embeddable Javascript component that aims to make it simple 
+to add notifications to your site or web app. 
 
-#### Live Demo
-See the widget in action at https://notiphy.me/demo/
+#### Demo
+See a demo [here](https://notiphy.me/demo/).
 
 ## Installation
 The easiest way to add the Notiphy widget is to use the CDN links below to include the widget in your HTML.
 
-### CDN (JSDelivr)
+### CDN Links
  
-- `https://cdn.notiphy.me/notiphy-widget.v1.1.umd.js`
+- JS `https://cdn.notiphy.me/notiphy-widget.v1.1.umd.js`
 
+  ```html
+  <script src="https://cdn.notiphy.me/notiphy-widget.v1.1.umd.js"></script>
+  ```
 
-- `https://cdn.notiphy.me/notiphy.min.css`
+- CSS `https://cdn.notiphy.me/notiphy.min.css` 
 
-```html
-<script src="https://cdn.notiphy.me/notiphy-widget.v1.1.umd.js"></script>
+  ```html
+  <link rel="stylesheet" href="https://cdn.notiphy.me/notiphy.min.css">
+  ```
 
-<link rel="stylesheet" href="https://cdn.notiphy.me/notiphy.min.css">
-```
+### Download
+Get the js and css files from the `/dist` directory and include them in your site.
 
-### Or build it yourself
+### Build
 #### Prerequisites
-- Node.js (version 14 or later)
-- npm (Node Package Manager)
+- Node.js 
+- npm 
 - Vite (for bundling and packaging)
 
 #### Setup
@@ -54,7 +59,7 @@ The easiest way to add the Notiphy widget is to use the CDN links below to inclu
 ## Usage
 
 ### Initialization
-To initialize the Notiphy Widget, include the generated JavaScript and css files from the `dist` folder (or CDN) in your HTML, and configure the widget as follows:
+To initialize the Notiphy Widget, include the generated JavaScript and css files from the `dist` folder (or CDN) in your HTML, and initialize the widget.
 
 ```html
 <!DOCTYPE html>
@@ -63,27 +68,26 @@ To initialize the Notiphy Widget, include the generated JavaScript and css files
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notiphy Widget</title>
-    <link rel="stylesheet" href="/dist/style.css">
+
+    <!-- Include the widget css -->
+    <link rel="stylesheet" href="/dist/notiphy.min.css">
 </head>
 <body>
-    <div id="notiphy-widget"></div>
+    <!-- Existing document body -->
+    ...
+    
+    <!-- Include the widget js -->
     <script src="dist/notiphy-widget.umd.js"></script>
     <script>
-        const widget = new NotiphyWidget({
+        // Initialize with default configuration.
+        const notiphyConfig = {
             subscriberId: 'your-subscriber-id',
-            widgetKey: 'your-api-key',
-            locationId: 'default',          // Optional
-            widgetTitle: 'Inbox',           // Optional
-            audioAlert: false,              // Optional
-            audioReminder: false,           // Optional
-            reminderInterval: 180,          // Optional
-            toastAlert: false,              // Optional
-            toastPosition: 'bottom-right',  // Optional
-            toastDuration: 4,               // Optional
-            showInboxOnLoad: false,         // Optional
-            refreshInterval: 0,             // Optional
-            compact: false,                 // Optional
-            targetElement: '.notiphy-container' // Required if compact
+            widgetKey: 'your-api-key'
+        }
+
+        // Initialize the widget after the DOM has loaded.
+        document.addEventListener('DOMContentLoaded', function () {
+            new NotiphyWidget(notiphyConfig);
         });
     </script>
 </body>
@@ -110,14 +114,14 @@ The Notiphy Widget can be configured with the following options:
 
 ### Features
 
-#### Real-Time Notifications
-The Notiphy Widget supports real-time notifications via WebSockets. Notifications are delivered instantly to the widget without the need for manual refreshes.
-
-#### Toast Alerts
-Toast notifications are brief messages that appear on the screen and fade out after a specified duration. You can customize the position and duration of toast notifications through the widget configuration.
-
 #### Inbox
-The Inbox displays all received notifications. Users can mark notifications as read or dismiss them. The Inbox can be opened and closed by clicking the widget icon.
+The Inbox displays all received notifications. Users can mark notifications as read or dismiss them. The Inbox is toggled by clicking the widget icon.
+
+#### Real-Time Notifications
+The Notiphy Widget supports real-time notifications via WebSockets. Notifications are delivered to the widget without the need for manual refreshes, with polling as backup.
+
+#### Toast Notifications
+Toast notifications are brief messages that appear on the screen and fade out after a specified duration. You can customize the default position and duration of toast notifications through the widget configuration. Users can reposition toasts via the settings menu in the widget.
 
 #### Audio Alerts and Reminders
 The widget can play a sound when a new notification is received (audioAlert) and can also play a reminder sound at specified intervals if there are unread notifications (audioReminder).
@@ -136,13 +140,12 @@ The following alert levels are supported, with appropriate styling.
 Toast notifications can be configured to appear in different positions on the screen, and their duration can be adjusted according to user preferences.
 
 #### Blocker Notifications
-Blocker notifications are critical notifications that require user interaction before proceeding. They appear as modal dialogs that must be dismissed before continuing with other tasks.
+Blocker notifications are critical notifications that require user interaction before proceeding. They appear as modal dialogs that must be dismissed before continuing with other tasks. Use wisely.
 
-### API Integration
-The Notiphy Widget integrates with the Notiphy.me service API. Use the api to further customize the widget, or build your own. 
+#### Compact Mode
+The widget can be rendered in a compact mode, a smaller, relatively positioned icon inside the specified container (`targetElement`). By default the widget is rendered in a fixed position at the bottom right of the screen.
 
 ### Example Usage
-
 To use the Notiphy Widget, include the necessary CSS and JS files in your HTML, and initialize the widget with your configuration. A demo API key is provided for development purposes, and will not work in production (localhost only).
 
 ```html
@@ -159,32 +162,32 @@ To use the Notiphy Widget, include the necessary CSS and JS files in your HTML, 
     <script>
         // Initialize with default configuration.
         const widget = new NotiphyWidget({
-            subscriberId: 'your-tenant-id',
+            subscriberId: 'your-subscriber-id',
             widgetKey: 'your-api-key',
         });
     </script>
 </body>
 </html>
 ```
-### Customization
+### Customize defaults
 
 To customize the widget, modify the configuration options passed during initialization. For example, to enable audio alerts and set the toast position to the top-right:
 
 ```javascript
 // Initialize with additional configuration options
 const widget = new NotiphyWidget({
-    subscriberId: 'your-tenant-id',
+    subscriberId: 'your-subscriber-id',
     widgetKey: 'your-api-key',
     audioAlert: true,          // load widget with audio enabled.
     toastAlert: true,          // load widget with toasts enabled.
     toastPosition: 'top-right' // set toast position to top-right.
 });
 ```
-Compact mode example.  Renders the widget in a relatively positioned target element.
+Compact mode example.  Renders the widget in a relatively positioned target element. The target element can be any element, but should be relatively positioned.
 ```javascript
 // Initialize with additional configuration options
 const widget = new NotiphyWidget({
-    subscriberId: 'your-tenant-id',
+    subscriberId: 'your-subscriber-id',
     locationId: 'user@domain.com',      // initialize for a particular user.
     widgetKey: 'your-api-key',
     audioAlert: true,                   // load widget with audio enabled.
@@ -195,6 +198,4 @@ const widget = new NotiphyWidget({
 });
 ```
 
-### Conclusion
 
-The Notiphy Widget is a powerful and flexible notification solution for your web applications. By following the setup and usage instructions provided in this documentation, you can quickly integrate and customize the widget to meet your notification needs.
