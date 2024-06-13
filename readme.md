@@ -27,7 +27,9 @@ The easiest way to add the Notiphy widget is to use the CDN links below to inclu
 ### Download
 Get the js and css files from the `/dist` directory and include them in your site.
 
-### Build
+### Build it yourself
+Make it better, please!
+
 #### Prerequisites
 - Node.js 
 - npm 
