@@ -55,7 +55,7 @@ from interfering with our styles */
         100px 100px 80px rgba(0, 0, 0, 0.07);
     box-sizing: border-box;
     cursor: pointer;
-    z-index: 5001;
+    z-index: 1054;
 }
 /* style icon when unread notifications exist */
 .notiphy-icon-unread {
@@ -130,7 +130,7 @@ from interfering with our styles */
 /* toast container */
 .notiphy-toaster {
     width: 340px;
-    z-index: 5001;
+    z-index: 5000;
 }
 
 /* Toaster Positions */
@@ -442,7 +442,7 @@ from interfering with our styles */
     background: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%);
     box-shadow: 0 3px 18px rgba(0, 0, 0, 0.3);
     border-radius: 11px;
-    z-index: 5000;
+    z-index: 1053;
     backdrop-filter: blur(10px);
     transform: scale(0); /* Start with the inbox scaled down */
     transform-origin: bottom right; /* Transform origin from the bottom right */
@@ -490,7 +490,7 @@ from interfering with our styles */
     border-radius: 11px 11px 0 0;
     border-bottom: 1px solid #ccc;
     backdrop-filter: blur(10px);
-    z-index: 5001;
+    z-index: 1054;
 }
 .notiphy-notification-center-header .notiphy-notification-center-title { 
     font-size: 1rem !important;
@@ -579,7 +579,7 @@ from interfering with our styles */
     background: #fff;
     box-shadow: 0 3px 18px rgba(0, 0, 0, 0.3);
     border-radius: 5px;
-    z-index: 5002;
+    z-index: 1055;
     width: 200px;
     padding: .2rem;
     transform: scale(0); /* Start scaled down */
@@ -792,7 +792,7 @@ from interfering with our styles */
     justify-content: center;
     align-items: center;
     /* backdrop-filter: blur(10px); */
-    z-index: 5001;
+    z-index: 1054;
 }
 
 /* Inbox notifications */
@@ -996,7 +996,7 @@ from interfering with our styles */
         box-shadow: none;
         background: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%);
         backdrop-filter: blur(10px);
-        z-index: 5001;
+        z-index: 1054;
     }
     .notiphy-notification-center-body {
         
@@ -1026,7 +1026,7 @@ from interfering with our styles */
         margin-right:.25rem;
     }
     .notiphy-icon {
-        z-index: 5000;
+        z-index: 1054;
     }
     .notiphy-modal-content {
         width: 90%;
