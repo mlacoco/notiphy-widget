@@ -284,9 +284,7 @@ export default class NotiphyWidget {
         const themeSelectorItem = document.createElement('div');
         themeSelectorItem.className = 'notiphy-settings-dropdown-item';
         themeSelectorItem.id = 'theme-selector-item';
-        themeSelectorItem.innerHTML = `
-            Display Mode <span class="notiphy-button-display-mode material-symbols-outlined" title="Change display mode">${this.getDisplayModeIcon()}</span>
-        `;
+        themeSelectorItem.innerHTML = `Display Mode <span class="notiphy-button-display-mode material-symbols-outlined" title="Change display mode">${this.getDisplayModeIcon()}</span>`;
         settingsDropdown.appendChild(themeSelectorItem);
 
         // Add event listener for display mode button
