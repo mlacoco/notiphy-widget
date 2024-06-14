@@ -23,7 +23,7 @@
 
      /* Light theme */
      --notiphy-background-light: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%);
-     --notiphy-settings-background-light: rgba(240, 240, 240, 1);
+     --notiphy-settings-background-light: rgba(250, 250, 250, 1);
      --notiphy-inbox-header-background-light: linear-gradient(rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 1) 90%);
      --notiphy-text-color-light: rgba(0, 0, 0, 0.9);
      --notiphy-notification-background-light: rgba(255, 255, 255, 1);

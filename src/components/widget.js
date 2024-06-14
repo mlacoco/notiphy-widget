@@ -96,7 +96,7 @@ export default class NotiphyWidget {
         // console.log('Saving settings:', this.config); // Debugging log
         sessionStorage.setItem('notiphySettings', JSON.stringify(this.config));
     }
-    
+
     /**
      * Loads user preferences (audio, toast, reminders)
      */
@@ -285,7 +285,7 @@ export default class NotiphyWidget {
         themeSelectorItem.className = 'notiphy-settings-dropdown-item';
         themeSelectorItem.id = 'theme-selector-item';
         themeSelectorItem.innerHTML = `
-            Display Mode <i class="notiphy-button-display-mode material-symbols-outlined" title="Change display mode">${this.getDisplayModeIcon()}</i>
+            Display Mode <span class="notiphy-button-display-mode material-symbols-outlined" title="Change display mode">${this.getDisplayModeIcon()}</span>
         `;
         settingsDropdown.appendChild(themeSelectorItem);
 
