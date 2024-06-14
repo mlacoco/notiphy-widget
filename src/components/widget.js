@@ -96,6 +96,7 @@ export default class NotiphyWidget {
         // console.log('Saving settings:', this.config); // Debugging log
         sessionStorage.setItem('notiphySettings', JSON.stringify(this.config));
     }
+    
     /**
      * Loads user preferences (audio, toast, reminders)
      */
@@ -104,6 +105,7 @@ export default class NotiphyWidget {
         // console.log('Loaded settings:', settings); // Debugging log
         return settings ? JSON.parse(settings) : null;
     }
+
     /**
      * Resets the settings by clearing localStorage and reloading default configuration.
      */
@@ -116,6 +118,7 @@ export default class NotiphyWidget {
         console.log('Settings have been reset to default.');
         location.reload(); // Reload the page to apply default settings
     }
+
     /**
      * Refreshes the notification center periodically to avoid expired notifications. Once expired, they're removed
      * from the database. Use this periodic check to remove expired notifications from the notification center.
@@ -130,7 +133,6 @@ export default class NotiphyWidget {
             console.log("Auto-refresh enabled:", Math.max(300 / 60,(refreshInterval / 60)),'minutes.');
         }
     }
-
 
     /**
      * Periodically checks for unread messages and plays an audio reminder.
@@ -277,7 +279,23 @@ export default class NotiphyWidget {
     
         const closeButton = document.querySelector('.notiphy-button-close');
         closeButton.addEventListener('click', () => this.toggleNotificationCenter());
-    
+        
+         // Add theme selector to settings dropdown
+        const themeSelectorItem = document.createElement('div');
+        themeSelectorItem.className = 'notiphy-settings-dropdown-item';
+        themeSelectorItem.id = 'theme-selector-item';
+        themeSelectorItem.innerHTML = `
+            Display Mode <i class="notiphy-button-display-mode material-symbols-outlined" title="Change display mode">${this.getDisplayModeIcon()}</i>
+        `;
+        settingsDropdown.appendChild(themeSelectorItem);
+
+        // Add event listener for display mode button
+        document.getElementById('theme-selector-item').addEventListener('click', () => {
+            this.changeDisplayMode();
+            this.updateSettingsDropdown();
+        });
+
+
         // Add reset item
         const resetItem = document.createElement('div');
         resetItem.className = 'notiphy-settings-dropdown-item';
@@ -307,6 +325,8 @@ export default class NotiphyWidget {
             +   `</div>`
             + `</div>`;
         document.body.appendChild(blockerModal);
+
+        initializeTheme();
     }
 
     // gets the appropriate icon for toast position
@@ -321,14 +341,25 @@ export default class NotiphyWidget {
         };
         return positionIcons[this.config.toastPosition] || 'south_east';
     }
-
-    // updates toast position icon
+    getDisplayModeIcon() {
+        const displayModeIcons = {
+            'light': 'light_mode',
+            'dark': 'dark_mode',
+            'auto': 'night_sight_auto'
+        };
+        const currentTheme = localStorage.getItem('notiphy-theme') || themes.AUTO;
+        return displayModeIcons[currentTheme];
+    }
+    // updates settings icons appropriately
     updateSettingsDropdown() {
         document.querySelector('.notiphy-button-audio-alert').innerHTML = this.config.audioAlert ? 'volume_up' : 'volume_off';
         document.querySelector('.notiphy-button-audio-reminder').innerHTML = this.config.audioReminder ? 'alarm_on' : 'alarm_off';
         document.querySelector('.notiphy-button-show-toasts').innerHTML = 'position_top_right';
         const toastPositionButton = document.querySelector('.notiphy-button-toast-position');
         toastPositionButton.innerHTML = this.getToastPositionIcon();
+        const displayModeButton = document.querySelector('.notiphy-button-display-mode');
+        displayModeButton.innerHTML = this.getDisplayModeIcon();
+
     }
     
     /**
@@ -341,6 +372,7 @@ export default class NotiphyWidget {
                     extraHeaders: {
                         'x-api-key': `${this.config.widgetKey}`,
                         'x-subscriber-id': `${this.config.subscriberId}`,
+                        'x-location-id': `${this.config.locationId}`,
                     }
                 }
             }
@@ -788,7 +820,8 @@ export default class NotiphyWidget {
         const notificationsCenter = document.querySelector('.notiphy-notification-center-body');
         const headers = new Headers({
             'x-api-key': `${this.config.widgetKey}`,
-            'x-subscriber-id': `${this.config.subscriberId}`
+            'x-subscriber-id': `${this.config.subscriberId}`,
+            'x-location-id': `${this.config.locationId}`,
         });
         fetch(`${this.config.serviceUrl}/widget/notifications?subscriberId=${this.config.subscriberId}&locationId=${this.config.locationId}`, { headers })
             .then((response) => {
@@ -867,12 +900,25 @@ export default class NotiphyWidget {
      * @returns {Promise<void>} - A Promise that resolves when the notification has been marked as read.
      */
     markRead(notificationId, targetElement) {
+        targetElement.classList.add("open");
+        targetElement.innerHTML = "mark_chat_read";
+        const unreadCountElement = document.querySelector(".notiphy-notification-center-stats-unread"); // unread count from inbox
+        let unreadCount = parseInt(unreadCountElement.innerHTML) - 1; // subtract one from the above
+        this.updateUnreadCount(Math.max(0, unreadCount)); // call updateUnreadCount with 0 or higher value
+        targetElement.closest(".notiphy-notification-element").classList.add("notiphy-read"); // mark this notification as read
+
+        // Find the notification's icon and update its innerText
+        const iconElement = targetElement.closest(".notiphy-notification-element").querySelector(".notiphy-notification-left i");
+        if (iconElement) {
+            iconElement.innerText = "notifications";
+        }
         fetch(`${this.config.serviceUrl}/widget/notification/mark-read`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 'x-api-key': `${this.config.widgetKey}`,
                 'x-subscriber-id': `${this.config.subscriberId}`,
+                'x-location-id': `${this.config.locationId}`,
             },
             body: JSON.stringify({ notificationId, subscriberId: this.config.subscriberId }),
         })
@@ -882,18 +928,7 @@ export default class NotiphyWidget {
                 // let other widgets at this location know that a notification has been dismissed
                 this.socket.emit("markReadNotification", notificationId);
                 
-                targetElement.classList.add("open");
-                targetElement.innerHTML = "mark_chat_read";
-                const unreadCountElement = document.querySelector(".notiphy-notification-center-stats-unread"); // unread count from inbox
-                let unreadCount = parseInt(unreadCountElement.innerHTML) - 1; // subtract one from the above
-                this.updateUnreadCount(Math.max(0, unreadCount)); // call updateUnreadCount with 0 or higher value
-                targetElement.closest(".notiphy-notification-element").classList.add("notiphy-read"); // mark this notification as read
                 
-                // Find the notification's icon and update its innerText
-                const iconElement = targetElement.closest(".notiphy-notification-element").querySelector(".notiphy-notification-left i");
-                if (iconElement) {
-                    iconElement.innerText = "notifications";
-                }
             });
     }
 
@@ -904,8 +939,10 @@ export default class NotiphyWidget {
         const markReadButtons = document.querySelectorAll(".notiphy-button-mark-read");
         Array.from(markReadButtons).forEach((button, index) => {
             setTimeout(() => {
-                this.markRead(button.dataset.notificationId, button);
-                this.playClickOffSound();
+                if (!button.closest(".notiphy-notification-element").classList.contains("notiphy-read")) {
+                    this.markRead(button.dataset.notificationId, button);
+                    this.playClickOffSound();
+                }
             }, index * 110); // short delay between each iteration
         });
     }
@@ -924,6 +961,7 @@ export default class NotiphyWidget {
                 "Content-Type": "application/json",
                 'x-api-key': `${this.config.widgetKey}`,
                 'x-subscriber-id': `${this.config.subscriberId}`,
+                'x-location-id': `${this.config.locationId}`,
             },
             body: JSON.stringify({
                 notificationId,
@@ -1031,6 +1069,28 @@ export default class NotiphyWidget {
         this.playClickOnSound()
         console.log("Toast Position", this.config.toastPosition);
         this.saveSettings(); // Save settings after change
+        this.updateSettingsDropdown();
+    }
+    /**
+     * Toggles display modes (dark/light/auto)
+     */
+    changeDisplayMode() {
+        const currentTheme = localStorage.getItem('notiphy-theme') || themes.AUTO;
+        let newTheme;
+        switch (currentTheme) {
+            case themes.LIGHT:
+                newTheme = themes.DARK;
+                break;
+            case themes.DARK:
+                newTheme = themes.AUTO;
+                break;
+            case themes.AUTO:
+                newTheme = themes.LIGHT;
+                break;
+            default:
+                newTheme = themes.AUTO;
+        }
+        setTheme(newTheme);
         this.updateSettingsDropdown();
     }
 
@@ -1210,3 +1270,28 @@ export default class NotiphyWidget {
     }
 }
 
+const themes = {
+    LIGHT: 'light',
+    DARK: 'dark',
+    AUTO: 'auto'
+};
+function setTheme(theme) {
+    // console.log("Setting theme to " + theme);
+    let appliedTheme = theme;
+    if (theme === themes.AUTO) {
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        appliedTheme = prefersDarkScheme ? themes.DARK : themes.LIGHT;
+    }
+
+    document.documentElement.setAttribute('data-theme', appliedTheme);
+    localStorage.setItem('notiphy-theme', theme);
+
+    
+}
+
+
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('notiphy-theme') || themes.AUTO;
+    // console.log("Initializing theme:", savedTheme);
+    setTheme(savedTheme);
+}
