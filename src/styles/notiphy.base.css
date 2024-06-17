@@ -24,28 +24,31 @@
      /* Light theme */
      --notiphy-background-light: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%);
      --notiphy-settings-background-light: rgba(250, 250, 250, 1);
-     --notiphy-inbox-header-background-light: linear-gradient(rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 1) 90%);
+     --notiphy-inbox-header-background-light: linear-gradient(rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, .25) 90%);
+     --notiphy-inbox-footer-background-light: linear-gradient(rgba(255, 255, 255, .25) 0%, rgba(255, 255, 255, 1) 90%);
      --notiphy-text-color-light: rgba(0, 0, 0, 0.9);
      --notiphy-notification-background-light: rgba(255, 255, 255, 1);
      --notiphy-notification-background-read-light: rgba(240, 240, 240, 1);
      --notiphy-notification-hover-light: rgba(245, 245, 245, 1);
-     --notiphy-notification-border-light: #e6e6e6;
+     --notiphy-notification-border-light: rgb(230, 230, 230);
  
      /* Dark theme */
-     --notiphy-background-dark: linear-gradient(150deg, rgba(47, 47, 47, .9) 5%, rgba(47, 47, 47, 0.5) 100%);
-     --notiphy-settings-background-dark: rgba(47, 47, 47, 1);
-     --notiphy-inbox-header-background-dark: linear-gradient(rgba(47, 47, 47, 0.25) 0%, rgba(47, 47, 47, 1) 90%);
+     --notiphy-background-dark: linear-gradient(150deg, rgba(5, 23, 34, 1) 5%, rgba(5, 23, 34, 0.7) 100%);
+     --notiphy-settings-background-dark: rgb(4, 26, 40);
+     --notiphy-inbox-header-background-dark: linear-gradient(rgba(5, 23, 34, 1) 0%, rgba(5, 23, 34, .25) 90%);
+     --notiphy-inbox-footer-background-dark: linear-gradient(rgba(5, 23, 34, .25) 0%, rgba(5, 23, 34, 1) 90%);
      --notiphy-text-color-dark: rgba(255, 255, 255, 0.9);
-     --notiphy-notification-background-dark: rgb(70, 70, 70);
-     --notiphy-notification-background-read-dark: rgb(90, 90, 90);
-     --notiphy-notification-hover-dark: rgba(54, 54, 54, 1);
-     --notiphy-notification-border-dark: #333333;
+     --notiphy-notification-background-dark: rgb(5, 23, 34);
+     --notiphy-notification-background-read-dark: rgb(5, 23, 34);
+     --notiphy-notification-hover-dark: rgba(5, 23, 34, .9);
+     --notiphy-notification-border-dark: rgb(34, 38, 50);
 }
 
 [data-theme="light"] {
     --notiphy-background: var(--notiphy-background-light);
     --notiphy-settings-background: var(--notiphy-settings-background-light);
     --notiphy-inbox-header-background: var(--notiphy-inbox-header-background-light);
+    --notiphy-inbox-footer-background: var(--notiphy-inbox-footer-background-light);
     --notiphy-text-color: var(--notiphy-text-color-light);
     --notiphy-notification-background: var(--notiphy-notification-background-light);
     --notiphy-notification-background-read: var(--notiphy-notification-background-read-light);
@@ -57,6 +60,7 @@
     --notiphy-background: var(--notiphy-background-dark);
     --notiphy-settings-background: var(--notiphy-settings-background-dark);
     --notiphy-inbox-header-background: var(--notiphy-inbox-header-background-dark);
+    --notiphy-inbox-footer-background: var(--notiphy-inbox-footer-background-dark);
     --notiphy-text-color: var(--notiphy-text-color-dark);
     --notiphy-notification-background: var(--notiphy-notification-background-dark);
     --notiphy-notification-background-read: var(--notiphy-notification-background-read-dark);
@@ -83,7 +87,8 @@ from interfering with our styles */
     right: 20px;
     width: 50px;
     height: 50px;
-    background-color: rgba(8, 5, 58, .8);
+    /* background-color: rgba(8, 5, 58, .8); */
+    background: linear-gradient(to bottom, #0f4767, #031621);
     /* Change based on notification status */
     border: 3px solid white;
     color: white;
@@ -279,6 +284,7 @@ from interfering with our styles */
 /* base toast */
 .notiphy-toast {
     border-left: 6px solid rgba(var(--notiphy-plain-color), 1);
+    border-radius:5px;
     box-shadow: 0 3px 18px rgba(0, 0, 0, 0.3);
     margin-bottom: .2rem;
     opacity: 0;
@@ -720,7 +726,7 @@ from interfering with our styles */
     font-family: var(--notiphy-logo-font-family);
     font-size: 1.15rem;
     color: var(--notiphy-text-color);
-    background: var(--notiphy-inbox-header-background);
+    background: var(--notiphy-inbox-footer-background);
     border-bottom-left-radius: 11px;
     border-bottom-right-radius: 11px;
     border-top: 1px solid var(--notiphy-notification-border);
@@ -815,7 +821,9 @@ from interfering with our styles */
     border-bottom: 1px solid var(--notiphy-notification-border);
     display: flex;
 }
-
+.notiphy-notification-element.notiphy-toast {
+    border-bottom:none;
+}
 /* Left-side icons in the notification elements, styled according to alert level */
 .notiphy-notification-element.notiphy-warning .notiphy-notification-left:first-child {
     background: rgba(var(--notiphy-warning-color), 1);
@@ -876,18 +884,18 @@ from interfering with our styles */
     justify-content: center;
     border-radius: 12px;
     margin: .5rem 1rem;
-    background: var(--notiphy-background);
+    background: var(--notiphy-settings-background);
     padding: 0 12px;
     text-decoration: none;
     color: var(--notiphy-text-color);
-    box-shadow: 0 2px 3px #0000004d;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.628);
     font-size: .75rem;
     height: 24px;
     cursor: pointer;
     transition: all .2s ease-in-out;
 }
 .notiphy-notification-element .notiphy-button-link:hover {
-    background-color:#868686;
+    border-color: rgba(var(--notiphy-info-color),1);
 }
 /* left column, notification icon/avatar */
 .notiphy-notification-left {
@@ -928,11 +936,14 @@ from interfering with our styles */
 .notiphy-notification-header {
     font-weight: bold;
     font-size: .9rem;
+    border-bottom: 1px solid var(--notiphy-notification-border);
+    margin-bottom:2px;
 }
 
 /* notification actions (mark-read, dismiss) */
 .notiphy-notification-actions {
     float: right;
+    font-size:1rem!important;
     /* font-size: .5rem !important; */
 }
 
@@ -1006,7 +1017,7 @@ from interfering with our styles */
         min-height: 100%;
         border-radius: 0;
         box-shadow: none;
-        /* background: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%); */
+        background: var(--notiphy-background);
         backdrop-filter: blur(10px);
         z-index: 1054;
     }

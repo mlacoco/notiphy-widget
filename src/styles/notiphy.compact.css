@@ -1,17 +1,24 @@
 /* src/styles/notiphy.compact.css */
 /* The widget icon in compact mode */
 .notiphy-icon.notiphy-compact {
-     width: 30px; 
-    height: 30px;
+     width: 28px; 
+    height: 28px;
     bottom: unset;
     right: unset;
-    border-width:2px;
+    /* background:unset; */
+    /* border:unset; */
+    border:1px solid #777;
     position: relative;
+    box-shadow:unset;
+    /* color:#777; */
 }
 .notiphy-compact>.material-symbols-outlined {
     font-size: .8em;
 }
-
+.notiphy-icon.notiphy-compact.notiphy-icon-unread {
+    /* text-shadow: unset;
+    color: #444; */
+}
 #notiphy-notification-center.notiphy-compact  {
     bottom:unset;
     top:1rem;
@@ -45,9 +52,9 @@
         min-height: 100%;
         border-radius: 0;
         box-shadow: none;
-        background: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%);
+        /* background: linear-gradient(150deg, rgba(255, 255, 255, .9) 5%, rgba(255, 255, 255, 0.5) 100%); */
         backdrop-filter: blur(10px);
-        z-index: 5001;
+        /* z-index: 5001; */
     }
     .notiphy-compact .notiphy-notification-center-header,
     .notiphy-compact .notiphy-notification-center-footer {
@@ -59,9 +66,7 @@
         left: unset;
         margin-right:.25rem;
     }
-    .notiphy-compact .notiphy-icon {
-        z-index: 5000;
-    }
+    
     .notiphy-compact .notiphy-modal-content {
         width: 90%;
     }
