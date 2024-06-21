@@ -345,7 +345,7 @@ export default class NotiphyWidget {
             'dark': 'dark_mode',
             'auto': 'night_sight_auto'
         };
-        const currentTheme = localStorage.getItem('notiphy-theme') || themes.AUTO;
+        const currentTheme = localStorage.getItem('notiphy-theme') || themes.LIGHT;
         return displayModeIcons[currentTheme];
     }
     // updates settings icons appropriately
@@ -379,7 +379,7 @@ export default class NotiphyWidget {
         this.socket = io(`${this.config.serviceUrl}/${this.config.subscriberId}`, options);
 
         this.socket.on('connect', async () => {
-             console.log('Connected to subscriberId:', this.config.subscriberId);
+            // console.log('Connected to subscriberId:', this.config.subscriberId);
             this.socket.emit('joinRoom', this.config.locationId);
             
             // this.playStartSound();
@@ -1064,16 +1064,17 @@ export default class NotiphyWidget {
         const currentIndex = positions.indexOf(this.config.toastPosition);
         this.config.toastPosition = positions[(currentIndex + 1) % positions.length];
         document.querySelector('.notiphy-toaster').className = `notiphy-toaster ${this.config.toastPosition}`;
-        this.playClickOnSound()
+        this.playClickOnSound();
         console.log("Toast Position", this.config.toastPosition);
         this.saveSettings(); // Save settings after change
         this.updateSettingsDropdown();
     }
+
     /**
      * Toggles display modes (dark/light/auto)
      */
     changeDisplayMode() {
-        const currentTheme = localStorage.getItem('notiphy-theme') || themes.AUTO;
+        const currentTheme = localStorage.getItem('notiphy-theme') || themes.LIGHT;
         let newTheme;
         switch (currentTheme) {
             case themes.LIGHT:
@@ -1086,9 +1087,10 @@ export default class NotiphyWidget {
                 newTheme = themes.LIGHT;
                 break;
             default:
-                newTheme = themes.AUTO;
+                newTheme = themes.LIGHT;
         }
         setTheme(newTheme);
+        this.playClickOnSound();
         this.updateSettingsDropdown();
     }
 
@@ -1289,7 +1291,7 @@ function setTheme(theme) {
 
 
 function initializeTheme() {
-    const savedTheme = localStorage.getItem('notiphy-theme') || themes.AUTO;
+    const savedTheme = localStorage.getItem('notiphy-theme') || themes.LIGHT;
     // console.log("Initializing theme:", savedTheme);
     setTheme(savedTheme);
 }

@@ -33,13 +33,13 @@
      --notiphy-notification-border-light: rgb(230, 230, 230);
  
      /* Dark theme */
-     --notiphy-background-dark: linear-gradient(150deg, rgba(5, 23, 34, 1) 5%, rgba(5, 23, 34, 0.7) 100%);
+     --notiphy-background-dark: linear-gradient(150deg, rgb(54, 55, 58) 5%, rgba(54, 55, 58, 0.85) 100%);
      --notiphy-settings-background-dark: rgb(4, 26, 40);
      --notiphy-inbox-header-background-dark: linear-gradient(rgba(5, 23, 34, 1) 0%, rgba(5, 23, 34, .25) 90%);
      --notiphy-inbox-footer-background-dark: linear-gradient(rgba(5, 23, 34, .25) 0%, rgba(5, 23, 34, 1) 90%);
      --notiphy-text-color-dark: rgba(255, 255, 255, 0.9);
      --notiphy-notification-background-dark: rgb(5, 23, 34);
-     --notiphy-notification-background-read-dark: rgb(5, 23, 34);
+     --notiphy-notification-background-read-dark: rgb(54, 55, 58);
      --notiphy-notification-hover-dark: rgba(5, 23, 34, .9);
      --notiphy-notification-border-dark: rgb(34, 38, 50);
 }
@@ -616,7 +616,7 @@ from interfering with our styles */
 .notiphy-settings-dropdown-item {
     display: flex;
     justify-content: space-between;
-    font-size:1rem;
+    font-size:.85rem;
     font-weight:normal;
     align-items: center;
     padding: 10px 15px;
@@ -650,7 +650,7 @@ from interfering with our styles */
     display: inline-block;
     width: 5px;
     height: 5px;
-    scale: 0.8;
+    scale: 1;
     border: 1px solid rgba(var(--notiphy-plain-color), 1);
     background-color: rgba(var(--notiphy-plain-color), 1);
     box-shadow: inset 0 1px #fafafa80, 0 0 3px 1px rgba(var(--notiphy-plain-color), 0.5);
@@ -954,7 +954,7 @@ from interfering with our styles */
 /* read notifications appear faded */
 .notiphy-notification-element.notiphy-read {
     background-color: var(--notiphy-notification-background-read)!important;
-    opacity: .75;
+    opacity: .7;
 }
 /* also reduce opacity of icon */
 .notiphy-notification-element.notiphy-read .notiphy-notification-left:first-child {
