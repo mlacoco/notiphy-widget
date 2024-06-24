@@ -94,7 +94,7 @@ export default class NotiphyWidget {
      */
     saveSettings() {
         // console.log('Saving settings:', this.config); // Debugging log
-        sessionStorage.setItem('notiphySettings', JSON.stringify(this.config));
+        localStorage.setItem('notiphySettings', JSON.stringify(this.config));
     }
 
     /**
@@ -104,7 +104,7 @@ export default class NotiphyWidget {
         // const settings = sessionStorage.getItem('notiphySettings');
         // console.log('Loaded settings:', settings); // Debugging log
         // return settings ? JSON.parse(settings) : null;
-        const storedSettings = sessionStorage.getItem('notiphySettings');
+        const storedSettings = localStorage.getItem('notiphySettings');
         if (storedSettings) {
             const parsedSettings = JSON.parse(storedSettings);
             // Overwrite locationId if it doesn't match
