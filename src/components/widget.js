@@ -101,9 +101,19 @@ export default class NotiphyWidget {
      * Loads user preferences (audio, toast, reminders)
      */
     loadSettings() {
-        const settings = sessionStorage.getItem('notiphySettings');
+        // const settings = sessionStorage.getItem('notiphySettings');
         // console.log('Loaded settings:', settings); // Debugging log
-        return settings ? JSON.parse(settings) : null;
+        // return settings ? JSON.parse(settings) : null;
+        const storedSettings = sessionStorage.getItem('notiphySettings');
+        if (storedSettings) {
+            const parsedSettings = JSON.parse(storedSettings);
+            // Overwrite locationId if it doesn't match
+            if (this.initialConfig.locationId !== parsedSettings.locationId) {
+                parsedSettings.locationId = this.initialConfig.locationId;
+            }
+            return parsedSettings;
+        }
+        return null;
     }
 
     /**

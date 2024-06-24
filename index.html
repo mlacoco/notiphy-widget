@@ -373,6 +373,7 @@
         const notiphyConfig = {
             subscriberId: 'notiphy',
             widgetKey: 'notiphy_LzPaJ43t_C8vn4iX1X3EvecxFxHcvdAYE',
+            serviceUrl: 'http://localhost:3000',
             locationId: 'notiphy_demo',        // Optional
             widgetTitle: 'Notification Feed',  // Optional
             height: '65vh',                    // Optional
@@ -387,7 +388,21 @@
             compact: false,                     // Optional
             targetElement: '.notiphy-container'// Optional
         }
-
+        // const notiphyConfig = {
+        //     subscriberId: 'acme',
+        //     widgetKey: 'acme_Srx1BFxn_5xNuUyUkLofrptnsG6widT2K',
+        //     // subscriberId: 'notiphy',
+        //     //              widgetKey: 'notiphy_LzPaJ43t_C8vn4iX1X3EvecxFxHcvdAYE',
+        //     locationId: "101", // store location code
+        //     height: '65vh', // Optional
+        //     audioAlert: true, // Optional
+        //     audioReminder: true, // Optional
+        //     reminderInterval: 120, // Optional
+        //     toastAlert: true, // Optional
+        //     toastPosition: 'top-center', // Optional
+        //     toastDuration: 4, // Optional
+        //     branded: false // Remove branding (unpublished)
+        //     }
         document.addEventListener('DOMContentLoaded', function () {
             new NotiphyWidget(notiphyConfig);
         });
