@@ -65,6 +65,8 @@ export default class NotiphyWidget {
         
         this.initialConfig = { ...this.defaultConfig, ...config };
         this.config = this.loadSettings() || this.initialConfig;
+        this.notifications = this.loadNotifications() || [];
+        this.checkLocationChange();
         this.saveSettings();
         
         // Check for required fields
@@ -96,7 +98,9 @@ export default class NotiphyWidget {
         // console.log('Saving settings:', this.config); // Debugging log
         localStorage.setItem('notiphySettings', JSON.stringify(this.config));
     }
-
+    loadNotifications() {
+        return JSON.parse(sessionStorage.getItem('notiphyWidgetNotifications')) || [];
+    }
     /**
      * Loads user preferences (audio, toast, reminders)
      */
@@ -116,12 +120,30 @@ export default class NotiphyWidget {
         return null;
     }
 
+    saveNotifications(notifications) {
+        sessionStorage.setItem('notiphyWidgetNotifications', JSON.stringify(notifications));
+    }
+
+    checkLocationChange() {
+        const storedSettings = JSON.parse(localStorage.getItem('notiphySettings'));
+        // console.log(storedSettings.locationId);
+        if (storedSettings && this.config.locationId !== storedSettings.locationId) {
+            this.clearStoredData();
+        }
+    }
+
+    clearStoredData() {
+        sessionStorage.removeItem('notiphyWidgetNotifications');
+        localStorage.removeItem('notiphyWidgetLastFetched');
+    }
     /**
      * Resets the settings by clearing localStorage and reloading default configuration.
      */
     resetSettings() {
         // console.log('Resetting settings to initial configuration.'); // Debugging log
-        sessionStorage.removeItem('notiphySettings');
+        sessionStorage.removeItem('notiphyWidgetNotifications');
+        localStorage.removeItem('notiphyWidgetLastFetched');
+        localStorage.removeItem('notiphySettings');
         this.config = { ...this.initialConfig };
         this.playClickOffSound();
         this.saveSettings();
@@ -498,6 +520,7 @@ export default class NotiphyWidget {
             iconElement.innerText = "notifications";
         }
         this.updateStatsAfterMarkRead(isRead);
+        this.updateLocalNotification(notificationid, { read: true });
     }
 
     /**
@@ -517,6 +540,8 @@ export default class NotiphyWidget {
             element.closest(".notiphy-notification-element").remove();
         });
         this.updateStatsAfterDismissal(isRead);
+        // Remove the notification from local storage
+        this.removeLocalNotification(notificationId);
     }
 
     /**
@@ -823,55 +848,87 @@ export default class NotiphyWidget {
      *
      * @returns {void}
      */
-    fetchNotifications() {
-        // console.log('Fetching notifications with config:', this.config); // Debugging log
+    async fetchNotifications() {
         const notificationsCenter = document.querySelector('.notiphy-notification-center-body');
         const headers = new Headers({
             'x-api-key': `${this.config.widgetKey}`,
             'x-subscriber-id': `${this.config.subscriberId}`,
             'x-location-id': `${this.config.locationId}`,
         });
-        fetch(`${this.config.serviceUrl}/widget/notifications?subscriberId=${this.config.subscriberId}&locationId=${this.config.locationId}`, { headers })
-            .then((response) => {
-                if (!response.ok) {
-                    // create an error notification object, and then add it to the notification center
-                    const notification = {
-                        id: 0,
-                        title: "Notiphy.me API Key Error",
-                        text: "The Notiphy.me API key provided is invalid. Please check your Notiphy.me dashboard for more information.",
-                        alertLevel: 'error',
-                        read: false,
-                        actionUrl: `https://notiphy.me/dashboard/api-keys`,
-                        _ts: new Date().getTime()
-                    };
-                    this.addToNotiphyCenter(notification);
-                    this.toggleConnection();
-                    if (this.config.audioReminder) {
-                        this.toggleAudioReminder();
-                    }
-                    throw new Error(`Request failed with status: ${response.status}`);
+    
+        const localNotifications = this.loadNotifications();
+        const lastFetched = localStorage.getItem('notiphyWidgetLastFetched') || 0;
+        
+        try {
+            const response = await fetch(`${this.config.serviceUrl}/widget/notifications?subscriberId=${this.config.subscriberId}&locationId=${this.config.locationId}&lastFetched=${lastFetched}`, { headers });
+            if (!response.ok) {
+                // Create an error notification object, and then add it to the notification center
+                const notification = {
+                    id: 0,
+                    title: "Notiphy.me API Key Error",
+                    text: "The Notiphy.me API key provided is invalid. Please check your Notiphy.me dashboard for more information.",
+                    alertLevel: 'error',
+                    read: false,
+                    actionUrl: `https://notiphy.me/dashboard/api-keys`,
+                    _ts: new Date().getTime()
+                };
+                this.addToNotiphyCenter(notification);
+                this.toggleConnection();
+                if (this.config.audioReminder) {
+                    this.toggleAudioReminder();
                 }
-                return response.json();
-            })
-            .then((notifications) => {
-                notificationsCenter.innerHTML = ``; // Clear previous notifications
-                this.updateUnreadCount(0);
-                this.updateTotalCount(0);
-                notifications.forEach((notification) => {
-                    this.addToNotiphyCenter(notification);
-                });
-                if (!this.notificationsLoaded && this.config.showInboxOnLoad) {
-                    this.toggleNotificationCenter();
+                throw new Error(`Request failed with status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            const fetchedNotifications = data || [];
+    
+            // Merge with local notifications
+            const notificationMap = new Map();
+    
+            // Add local notifications to the map
+            localNotifications.forEach(notification => {
+                notificationMap.set(notification.id, notification);
+            });
+    
+            // Update the map with fetched notifications
+            fetchedNotifications.forEach(notification => {
+                if (notification.dismissed) {
+                    // Remove dismissed notifications from local storage
+                    notificationMap.delete(notification.id);
+                } else {
+                    notificationMap.set(notification.id, notification);
                 }
-                this.notificationsLoaded = true;
-                // const unreadCount = document.querySelector(".notiphy-notification-center-stats-unread");
-                // if (parseInt(unreadCount.textContent) > 0) {
-                //     this.playPopSound();
-                // }
-            })
-            .catch((error) => console.error("Failed to fetch notifications:", error));
+            });
+    
+            // Convert the map back to an array
+            this.notifications = Array.from(notificationMap.values());
+    
+            // Save the merged notifications to session storage
+            this.saveNotifications(this.notifications);
+    
+            // Clear and repopulate the notification center
+            notificationsCenter.innerHTML = ``;
+            this.updateUnreadCount(0);
+            this.updateTotalCount(0);
+            this.notifications.forEach(notification => {
+                this.addToNotiphyCenter(notification);
+            });
+    
+            if (!this.notificationsLoaded && this.config.showInboxOnLoad) {
+                this.toggleNotificationCenter();
+            }
+            this.notificationsLoaded = true;
+    
+            // Save the current timestamp as the last fetched time in UTC
+            const newLastFetched = Math.floor(Date.now() / 1000); // Unix timestamp in seconds
+            localStorage.setItem('notiphyWidgetLastFetched', newLastFetched);
+        } catch (error) {
+            console.error("Failed to fetch notifications:", error);
+        }
     }
-
+    
+    
     /**
      * Toggles the visibility of the inbox element.
      * If the notifications center is currently hidden, this function will show it.
@@ -899,7 +956,6 @@ export default class NotiphyWidget {
         const notificationBody = document.querySelector(".notiphy-notification-center-body");
         notificationBody.scrollTo({ top: 0, behavior: "smooth" });
     }
-
     /**
      * Marks a notification as read and updates the unread count.
      *
@@ -910,16 +966,17 @@ export default class NotiphyWidget {
     markRead(notificationId, targetElement) {
         targetElement.classList.add("open");
         targetElement.innerHTML = "mark_chat_read";
-        const unreadCountElement = document.querySelector(".notiphy-notification-center-stats-unread"); // unread count from inbox
-        let unreadCount = parseInt(unreadCountElement.innerHTML) - 1; // subtract one from the above
-        this.updateUnreadCount(Math.max(0, unreadCount)); // call updateUnreadCount with 0 or higher value
-        targetElement.closest(".notiphy-notification-element").classList.add("notiphy-read"); // mark this notification as read
-
+        const unreadCountElement = document.querySelector(".notiphy-notification-center-stats-unread");
+        let unreadCount = parseInt(unreadCountElement.innerHTML) - 1;
+        this.updateUnreadCount(Math.max(0, unreadCount));
+        targetElement.closest(".notiphy-notification-element").classList.add("notiphy-read");
+    
         // Find the notification's icon and update its innerText
         const iconElement = targetElement.closest(".notiphy-notification-element").querySelector(".notiphy-notification-left i");
         if (iconElement) {
             iconElement.innerText = "notifications";
         }
+    
         fetch(`${this.config.serviceUrl}/widget/notification/mark-read`, {
             method: "POST",
             headers: {
@@ -930,19 +987,17 @@ export default class NotiphyWidget {
             },
             body: JSON.stringify({ notificationId, subscriberId: this.config.subscriberId }),
         })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data.message);
-                // let other widgets at this location know that a notification has been dismissed
-                this.socket.emit("markReadNotification", notificationId);
-                
-                
-            });
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data.message);
+            // Let other widgets at this location know that a notification has been marked as read
+            this.socket.emit("markReadNotification", notificationId);
+    
+            // Update the local storage
+            this.updateLocalNotification(notificationId, { read: true });
+        });
     }
-
-    /**
-     * Reuses markRead() to mark all notifications as read.
-     */
+    
     markAllRead() {
         const markReadButtons = document.querySelectorAll(".notiphy-button-mark-read");
         Array.from(markReadButtons).forEach((button, index) => {
@@ -951,10 +1006,9 @@ export default class NotiphyWidget {
                     this.markRead(button.dataset.notificationId, button);
                     this.playClickOffSound();
                 }
-            }, index * 110); // short delay between each iteration
+            }, index * 110);
         });
     }
-
     /**
      * Dismisses a notification from the UI and updates the total and unread notification counts.
      *
@@ -977,31 +1031,32 @@ export default class NotiphyWidget {
                 locationCode: this.config.locationId,
             }),
         })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data.message);
-
-                // let other widgets at this location know that a notification has been dismissed
-                this.socket.emit("dismissNotification", notificationId);
-
-                // update total count,
-                const totalCountElement = document.querySelector(".notiphy-notification-center-stats-total");
-                let totalCount = parseInt(totalCountElement.textContent) - 1;
-                this.updateTotalCount(Math.max(0, totalCount));
-
-                //   update the unread count if the dismissed notification was unread
-                if (!targetElement.parentNode.parentNode.parentNode.classList.contains("notiphy-read")
-                ) {
-                    const unreadCountElement = document.querySelector(".notiphy-notification-center-stats-unread");
-                    let unreadCount = parseInt(unreadCountElement.textContent) - 1;
-                    this.updateUnreadCount(Math.max(0, unreadCount));
-                }
-
-                if (targetElement.parentNode.parentNode.parentNode) {
-                    targetElement.parentNode.parentNode.parentNode.remove();
-                }
-
-            });
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data.message);
+    
+            // Let other widgets at this location know that a notification has been dismissed
+            this.socket.emit("dismissNotification", notificationId);
+    
+            // Update the total count
+            const totalCountElement = document.querySelector(".notiphy-notification-center-stats-total");
+            let totalCount = parseInt(totalCountElement.textContent) - 1;
+            this.updateTotalCount(Math.max(0, totalCount));
+    
+            // Update the unread count if the dismissed notification was unread
+            if (!targetElement.parentNode.parentNode.parentNode.classList.contains("notiphy-read")) {
+                const unreadCountElement = document.querySelector(".notiphy-notification-center-stats-unread");
+                let unreadCount = parseInt(unreadCountElement.textContent) - 1;
+                this.updateUnreadCount(Math.max(0, unreadCount));
+            }
+    
+            if (targetElement.parentNode.parentNode.parentNode) {
+                targetElement.parentNode.parentNode.parentNode.remove();
+            }
+    
+            // Remove the notification from local storage
+            this.removeLocalNotification(notificationId);
+        });
     }
 
     /**
@@ -1017,7 +1072,22 @@ export default class NotiphyWidget {
         });
             this.playCrumpleSound();
     }
+
+    updateLocalNotification(notificationId, updates) {
+        const notifications = this.loadNotifications();
+        const notificationIndex = notifications.findIndex(n => n.id === notificationId);
+        if (notificationIndex !== -1) {
+            notifications[notificationIndex] = { ...notifications[notificationIndex], ...updates };
+            this.saveNotifications(notifications);
+        }
+    }
     
+    removeLocalNotification(notificationId) {
+        let notifications = this.loadNotifications();
+        notifications = notifications.filter(n => n.id !== notificationId);
+        this.saveNotifications(notifications);
+    }
+
     /**
      * Toggles all sounds on or off.
      *
